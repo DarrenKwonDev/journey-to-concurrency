@@ -18,9 +18,11 @@ if max_workers is None:
     # We use cpu_count + 4 for both types of tasks.
     # But we limit it to 32 to avoid consuming surprisingly large resource
     # on many core machine.
+
+    # os.cpu_count() -> # how many cores the system has
     max_workers = min(32, (os.cpu_count() or 1) + 4)
 
-내부적으로 _work_queue에 _WorkItem을 넣어서 관리한다. 
+내부적으로 _work_queue에 _WorkItem을 넣어서 관리한다. submit되면 enqueue하고 shutdown되면 drain하고 cancel한다.   
 """
 
 if __name__ == '__main__':
