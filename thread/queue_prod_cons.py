@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     queue = queue.Queue(maxsize=10) # consumer의 throughput을 고려하여 적절한 queue size를 설정해야 함
 
-    event = threading.Event() # 공용 event 객체로 flag용임.
+    event = threading.Event() # thread간 통신을 위해 사용하는 event 객체로 flag용임.
     print(event.__dict__) # 최초 _flag: False
 
     with ThreadPoolExecutor(max_workers=3) as executor:
