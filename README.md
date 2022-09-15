@@ -30,6 +30,7 @@
     - 임계 구역을 잠그는 역할: acquire
     - 함수 임계 구역의 잠금을 해제하는 역할: release 함수
   - C/C++, python 등의 프로그래밍 언어에서는 사용자가 직접 acquire, release 함수를 구현하지 않도록 뮤텍스 락 기능을 제공합니다.
+    - thread/thread_sync.py 참고
   - 커널단에서는 빅 커널락(BKL)을 통해 동시 접근을 제어한다
 
 ### (CPython 한정) GIL(Global Interpreter Lock)
