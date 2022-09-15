@@ -6,6 +6,21 @@ import os
 
 """
 ThreadPoolExecutor
+
+내부 구현을 보면 생각보다 단순한 편이니 꼭 읽어보자
+
+내부 구현 살펴보면 max_workers의 제한이 아래와 같다.
+if max_workers is None:
+    # ThreadPoolExecutor is often used to:
+    # * CPU bound task which releases GIL
+    # * I/O bound task (which releases GIL, of course)
+    #
+    # We use cpu_count + 4 for both types of tasks.
+    # But we limit it to 32 to avoid consuming surprisingly large resource
+    # on many core machine.
+    max_workers = min(32, (os.cpu_count() or 1) + 4)
+
+내부적으로 _work_queue에 _WorkItem을 넣어서 관리한다. 
 """
 
 if __name__ == '__main__':
