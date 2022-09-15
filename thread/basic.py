@@ -4,7 +4,7 @@ import threading
 import os
 
 if __name__ == '__main__':
-    format = "%(asctime)s: %(message)s, %(threadName)s: %(message)s"
+    format = "%(asctime)s: [%(threadName)s] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=format, datefmt="%H:%M:%S")
 
     logging.debug(f"main pid: {os.getpid()}")
