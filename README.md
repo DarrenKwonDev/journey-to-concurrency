@@ -5,6 +5,7 @@
 https://docs.python.org/ko/3/library/threading.html  
 https://docs.python.org/ko/3/library/multiprocessing.html  
 https://docs.python.org/ko/3/library/concurrent.futures.html
+https://docs.python.org/ko/3/library/asyncio.html
 
 ## 동시성과 병렬성
 
