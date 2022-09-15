@@ -22,5 +22,5 @@ if __name__ == '__main__':
     with ThreadPoolExecutor(max_workers=3) as executor:
         tasks = executor.map(task, ["task1", "task2", "task3"])
 
-        print(list(tasks))
+        print(list(tasks)) # return thread return value
 
