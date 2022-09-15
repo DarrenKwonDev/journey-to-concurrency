@@ -63,3 +63,7 @@ https://docs.python.org/ko/3/library/asyncio.html
 ```text
 js의 generator는 자동으로 반복 실행되지 않아서 절반만 코루틴이다.
 ```
+
+## golang의 goroutine
+
+작성 예정...
