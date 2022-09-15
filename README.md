@@ -1,5 +1,11 @@
 # concurrency, parallelism, thread, process
 
+## docs
+
+https://docs.python.org/ko/3/library/threading.html  
+https://docs.python.org/ko/3/library/multiprocessing.html  
+https://docs.python.org/ko/3/library/concurrent.futures.html
+
 ## 동시성과 병렬성
 
 - 동시성(concurrency) : 싱글 코어에서 멀티 쓰레드를 동작 시키는 방식. 따라서 동시에 실행되는 것처럼 보이는 것일 뿐임.

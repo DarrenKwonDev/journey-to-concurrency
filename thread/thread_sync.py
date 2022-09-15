@@ -39,6 +39,7 @@ class FakeDataStore:
         logging.debug(f"before {self.data}")
 
         # lock acquire, release를 with문으로 간단하게 표현 가능
+        # https://docs.python.org/ko/3.10/library/threading.html#using-locks-conditions-and-semaphores-in-the-with-statement
         with self._lock:
             logging.debug(f"thread {thread_name} has lock")
 
