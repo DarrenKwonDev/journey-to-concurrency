@@ -68,7 +68,7 @@ https://docs.python.org/ko/3/library/asyncio.html
       응용 프로그램에서 멀티 코어 기계의 계산 자원을 더 잘 활용하려면 multiprocessing이나 concurrent.futures.ProcessPoolExecutor를 사용하는 것이 좋습니다. 그러나, 여러 I/O 병목 작업을 동시에 실행하고 싶을 때 threading은 여전히 적절한 모델입니다.
       ```
 
-### cpu bound, I/O bound
+### CPU bound, I/O bound
 
 - 비디오 재생이나 디스크 백업 작업을 담당하는 프로세스와 같이 입출력 작업이 많은 프로세스도 있고, 복잡한 수학 연산, 컴파일, 그래픽 처리 작업을 담당하는 프로세스와 같이 CPU 작업이 많은 프로세스도 있습니다. 전자를 **입출력 집중 프로세스 I/O bound process**라고 하고, 후자를 **CPU 집중 프로세스 CPU bound process**라고 함
 
@@ -83,16 +83,16 @@ https://docs.python.org/ko/3/library/asyncio.html
 
 ## coroutine
 
-코루틴(coroutine)은 애플리케이션 레벨의 스레드를 활용한다.
-
-스레드는 원래 특정 어플리케이션에서 스레드를 과도하게 사용하면 컴퓨팅 리소스가 부족해진다. 그래서 OS에 부담을 주지 않으면서 애플리케이션 단에서 스레드를 마음껏 쓸 수 있게 고안된 것이 코루틴이다.
-
-코루틴을 활용하면 단일 스레드로 동작하는 프로그래밍 언어(우리의 js..)가 멀티 스레드로 동작하는 것처럼 보이게 할 수 있다.
-
-```text
-js의 generator는 자동으로 반복 실행되지 않아서 절반만 코루틴이다.
-```
+작성 예정...
 
 ## golang의 goroutine
 
 작성 예정...
+
+## 브라우저 런타임에서 web worker를 활용한 multi threading
+
+작성 예정...
+
+https://darrengwon.tistory.com/1171  
+
+
