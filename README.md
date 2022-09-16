@@ -1,11 +1,12 @@
-# concurrency, parallelism, thread, process, actor, light-weight thread
+# concurrency, parallelism, thread, process, actor, LWT, web-worker
 
 ## docs
 
 https://docs.python.org/ko/3/library/threading.html  
 https://docs.python.org/ko/3/library/multiprocessing.html  
 https://docs.python.org/ko/3/library/concurrent.futures.html  
-https://docs.python.org/ko/3/library/asyncio.html
+https://docs.python.org/ko/3/library/asyncio.html  
+https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
 
 ## 동시성과 병렬성
 
@@ -93,6 +94,4 @@ https://docs.python.org/ko/3/library/asyncio.html
 
 작성 예정...
 
-https://darrengwon.tistory.com/1171  
-
-
+https://darrengwon.tistory.com/1171
