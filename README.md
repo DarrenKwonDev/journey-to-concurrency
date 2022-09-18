@@ -1,13 +1,5 @@
 # concurrency, parallelism, thread, process, actor, LWT, web-worker
 
-## docs
-
-https://docs.python.org/ko/3/library/threading.html  
-https://docs.python.org/ko/3/library/multiprocessing.html  
-https://docs.python.org/ko/3/library/concurrent.futures.html  
-https://docs.python.org/ko/3/library/asyncio.html  
-https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
-
 ## 동시성과 병렬성
 
 - 동시성(concurrency) : 싱글 코어에서 멀티 쓰레드를 동작 시키는 방식. 따라서 동시에 실행되는 것처럼 보이는 것일 뿐임.
@@ -125,3 +117,14 @@ https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
 
 https://darrengwon.tistory.com/1171
 https://codersblock.com/assets/demos/web-workers/single.html -> source tabdp서 코드 확인 요망
+
+## docs
+
+https://docs.python.org/ko/3/library/threading.html  
+https://docs.python.org/ko/3/library/multiprocessing.html  
+https://docs.python.org/ko/3/library/concurrent.futures.html  
+https://docs.python.org/ko/3/library/asyncio.html  
+https://tech.ssut.me/python-3-play-with-asyncio/  
+https://blog.nindalf.com/posts/how-goroutines-work/  
+https://leimao.github.io/blog/Python-Concurrency-High-Level/  
+https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
