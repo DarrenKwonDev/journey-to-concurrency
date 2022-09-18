@@ -24,7 +24,7 @@ def main():
         p.start()
 
     for p in process_list:
-        p.join()
+        p.join() # 다른 프로세스가 끝날 때 까지 기다려.
     
     print(share_value.value) # 500
 
