@@ -95,3 +95,4 @@ https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
 작성 예정...
 
 https://darrengwon.tistory.com/1171
+https://codersblock.com/assets/demos/web-workers/single.html -> source tabdp서 코드 확인 요망
