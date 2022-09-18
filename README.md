@@ -14,7 +14,11 @@ https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
   - context switching이 매우 빠르게 작동하여 동시에 여러 작업을 하는 것처럼 보이는 것
 - 병렬성(parallelism) : 멀티 코어에서 멀티 쓰레드를 동작시키는 방식. 실제로 동시에 실행됨. 멀티 코어 CPU가 필요함.
 
+- 동시성과 병렬성의 차이가 뭐지
+
   - 1 core면 병렬 프로그래밍 불가
+  - 동시성은 보통 `한 개의 작업을 공유하여 처리하는 작업`에 사용함
+  - 병렬성은 보통 주로 `별개의 작업을 처리`하는데 사용함
 
 - CPU 내 1 core 당 ALU, 제어 장치, register가 들어 있다. 이것은 core 당 독립적인 명령어 처리가 가능하다는 것이다. 여러 CPU를 묶어놓은 것이라 생각하면 편하다.
 - 하드웨어 스레드와 소프트웨어의 스레드는 별개의 용어이므로 혼동하지 말 것. 혼동을 피하기 위해 하드웨어 스레드는 논리 프로세서라고 부르기도 함.
@@ -69,6 +73,27 @@ https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
       응용 프로그램에서 멀티 코어 기계의 계산 자원을 더 잘 활용하려면 multiprocessing이나 concurrent.futures.ProcessPoolExecutor를 사용하는 것이 좋습니다. 그러나, 여러 I/O 병목 작업을 동시에 실행하고 싶을 때 threading은 여전히 적절한 모델입니다.
       ```
 
+## blocking, non-blocking, sync, async
+
+- blocking, non-blocking은 요청의 결과를 곧바로 future든 promise든 돌려주는지, 아니면 기다리는(blocking) 것인지의 여부
+
+  - 제어권을 넘겨주는지, 아니면 기다리는지의 여부
+  - blocking이라면 요청의 결과를 기다려야하며 다른 일을 할 수 없다. 제어권이 커널 소유에게 있고 호출한 쪽은 기다려야 한다는 말이다
+
+- sync, async
+  - sync : 작업 완료 여부를 호출한 쪽이 커널한테 물어본다면
+    - "일 다 됐어요?" 즉, 주기적으로 물어봐야 한다.
+  - async : 작업 완료 여부를 커널이 호출한 쪽에 알려준다면
+    - "야 일 다 됐다"
+    - 작업이 완료되면 callback을 호출해서 알려주는 방식이 대표적 패턴
+
+### 2x2 matrix로 설명
+
+- `sync, blocking` -> 값 들어올 때까지 기다려야하며, 작업 완료 여부를 호출 프로세스에서 물어봐야 함
+- async, blocking -> 값이 들어올 때까지 기다려야하며, 작업 완료 여부를 처리하는 쪽에서 호출 프로세스로 callback해준다
+- `async, non-blocking` -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 처리하는 쪽에서 호출 프로세스로 callback해준다
+- async, non-blocking -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 호출 프로세스에서 물어봐야 함
+
 ### CPU bound, I/O bound
 
 - 비디오 재생이나 디스크 백업 작업을 담당하는 프로세스와 같이 입출력 작업이 많은 프로세스도 있고, 복잡한 수학 연산, 컴파일, 그래픽 처리 작업을 담당하는 프로세스와 같이 CPU 작업이 많은 프로세스도 있습니다. 전자를 **입출력 집중 프로세스 I/O bound process**라고 하고, 후자를 **CPU 집중 프로세스 CPU bound process**라고 함
@@ -76,7 +101,10 @@ https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
   - CPU를 이용하는 작업을 **CPU 버스트(CPU burst)** 라 하고, 입출력장치를 기다리는 작업을 **입출력 버스트(I/O burst)** 라 부른다. 즉, 프로세스는 일반적으로 CPU 버스트와 입출력 버스트를 반복하며 실행된다고 볼 수 있다. 그래서 입출력 집중 프로세스는 입출력 버스트가 많은 프로세스, CPU 집중 프로세스는 CPU 버스트가 많은 프로세스라고 정의할 수 있습니다.
 
 - 다만 CPU는 하나다. (core는 여러개지만.) 희소한 자원인 까닭에 운영체제는 프로세스마다 우선순위 priority를 부여하고 관리한다. 운영체제는 각 프로세스의 PCB에 우선순위를 명시하고, PCB에 적힌 우선순위를 기준으로 먼저 처리할 프로세스를 결정한다.
+
   - 입출력 집중 프로세스는 실행 상태보다는 입출력을 위한 대기 상태에 더 많이 머무르게 된다. 반대로 CPU 집중 프로세스는 대기 상태보다는 실행 상태에 더 많이 머무르게 된다. 그래서 보통 I/O bound process가 CPU bound process보다 우선순위가 높다.
+
+-
 
 ## actor model
 
