@@ -85,6 +85,10 @@
 - `async, non-blocking` -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 처리하는 쪽에서 호출 프로세스로 callback해준다
 - async, non-blocking -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 호출 프로세스에서 물어봐야 함
 
+### event-loop 모델  
+
+작성 예정
+
 ## CPU bound, I/O bound
 
 - 비디오 재생, 네트워크 통신, 디스크 읽고 쓰기 등의 작업을 담당하는 프로세스 -> **입출력 집중 프로세스 I/O bound process**
@@ -129,3 +133,4 @@ https://tech.ssut.me/python-3-play-with-asyncio/
 https://blog.nindalf.com/posts/how-goroutines-work/  
 https://leimao.github.io/blog/Python-Concurrency-High-Level/  
 https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
+https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
