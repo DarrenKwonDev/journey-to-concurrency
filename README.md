@@ -85,10 +85,6 @@
 - `async, non-blocking` -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 처리하는 쪽에서 호출 프로세스로 callback해준다
 - async, non-blocking -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 호출 프로세스에서 물어봐야 함
 
-### event-loop 모델  
-
-작성 예정
-
 ## CPU bound, I/O bound
 
 - 비디오 재생, 네트워크 통신, 디스크 읽고 쓰기 등의 작업을 담당하는 프로세스 -> **입출력 집중 프로세스 I/O bound process**
@@ -103,6 +99,24 @@
 - 일반적으로 CPU bound 작업은 multi process, I/O bound 작업은 multi thread로 구현하는 편이다.
   - 연산을 많이 해야 한다면 CPU를 많이 사용해야 하므로 multi process가 적합하다.
   - I/O 작업에서 요청에 대한 유휴 시간을 효율적으로 사용하기 multi thread가 적합하다.
+
+## network I/O를 이해하기 위한 socket 및 다중 접속 처리
+
+### socket
+
+> 소켓은 네트워크에서 서버와 클라이언트, 두 개의 프로세스가 특정 포트를 통해 양방향 통신이 가능하도록 만들어 주는 추상화된 장치입니다. 메모리의 사용자 공간에 존재하는 프로세스(서버, 클라이언트)는 커널 공간에 생성된 소켓을 통해 데이터를 송수신할 수 있습니다.
+>
+> > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
+
+### event-loop 모델 및 다중 접속을 처리하는 방식
+
+작성 예정...
+
+[node.js의 dont-block-the-event-loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)은 다중 접속 하에 오는 여러 client들의 요청을 처리하는 스레드가 blocking 방식의 처리를 하면 성능 처하가 일어날 수 있다고 설명하고 있다.
+
+프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?
+
+과거 apache는 connection이 생성될 때마다 process를 생성하는 멀티 프로세스 방식임. process를 만드는 건 시간이 소요되는 일이므로 prefork 방식(미리 process를 만듦)으로 작동함. 문제는 클라이언트가 많이 짐에 따라 ‘동시에 연결된 커넥션'이 많아졌을 때 **C10K Problem**이 발생 (connection 1만개 문제) 커넥션을 더 이상 늘릴 수 없게 됨. 하드웨어 성능 문제가 아니었음. apache 서버가 connection이 생성될 때마다 process를 생성하는 구조이기 때문에 문제가 되는 것임. 프로세스가 많아서 메모리 부족으로 이어짐. 게다가 프로세스를 바꿔가며 일해야 하기 때문에 context switching이 자주 일어나게 되었음.
 
 ## actor model
 
@@ -132,5 +146,5 @@ https://docs.python.org/ko/3/library/asyncio.html
 https://tech.ssut.me/python-3-play-with-asyncio/  
 https://blog.nindalf.com/posts/how-goroutines-work/  
 https://leimao.github.io/blog/Python-Concurrency-High-Level/  
-https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API
+https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API  
 https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
