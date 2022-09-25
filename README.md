@@ -1,4 +1,56 @@
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+- [concurrency, parallelism, thread, process, actor, LWT, web-worker](#concurrency-parallelism-thread-process-actor-lwt-web-worker)
+  - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
+  - [동시성과 병렬성](#동시성과-병렬성)
+  - [multi-threading & multi-processing](#multi-threading--multi-processing)
+  - [동시성에서 발생하는 공유 자원 문제](#동시성에서-발생하는-공유-자원-문제)
+    - [(CPython 한정) GIL(Global Interpreter Lock)](#cpython-한정-gilglobal-interpreter-lock)
+  - [blocking, non-blocking, sync, async](#blocking-non-blocking-sync-async)
+    - [2x2 matrix로 설명](#2x2-matrix로-설명)
+  - [CPU bound, I/O bound](#cpu-bound-io-bound)
+  - [network I/O를 이해하기 위한 socket 및 다중 접속 처리](#network-io를-이해하기-위한-socket-및-다중-접속-처리)
+    - [socket](#socket)
+    - [다중 접속 처리](#다중-접속-처리)
+      - [프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?](#프로세스를-여러-개-생성하여-다중-접속을-처리하는-것이-왜-문제가-되느냐)
+    - [event-loop 모델](#event-loop-모델)
+  - [actor model](#actor-model)
+  - [green thread](#green-thread)
+    - [threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법](#threading-model--프로그래밍-언어에서-user-thread를-os-thread와-매핑하는-방법)
+    - [적절한 thread pool size](#적절한-thread-pool-size)
+  - [coroutine](#coroutine)
+  - [golang의 goroutine](#golang의-goroutine)
+  - [브라우저 런타임에서 web worker를 활용한 multi threading](#브라우저-런타임에서-web-worker를-활용한-multi-threading)
+  - [docs](#docs)
+
+<!-- code_chunk_output -->
+<!-- /code_chunk_output -->
+
+---
+
 # concurrency, parallelism, thread, process, actor, LWT, web-worker
+
+## 하드웨어적 스레드와 소프트웨어적 스레드
+
+```mermaid
+flowchart LR
+
+A(Thread) --> B(하드웨어적 스레드)
+A(Thread) --> C(소프트웨어적 스레드)
+C --> D(OS, kernel, native Thread)
+C --> E(user, green Thread)
+
+```
+
+하드웨어 스레드는 1 core 당 처리하는 명령어 단위이다. 멀티 쓰레드 지원하는 CPU는 1 core에서 여러 개의 명령어를 동시에 실행할 수 있다.  
+어떻게 이런게 가능하냐면.. -> 레지스터를 여러대 두면 된다.
+예를 들어 2 core, 4 thead는 CPU에 2개의 코어가 들어가 있고 각 코어당 2개의 명령어를 동시에 처리할 수 있다는 말일 터이다. 어쨌거나 OS 입장에서는 동시에 4개의 명령어가 동시 처리 되니까 "어? 코어가 4개인가?" 라는 생각을 하게 된다. 그래서 하드웨어 스레드를 논리 프로세서라 부르기도 한다.
+
+반면 소프트웨어적 스레드는 하나의 프로그램에서 독립적으로 실행되는 단위이다. 한 소프트웨어 내에서 여러 기능들이 동시에 수행되려면 각 기능의 코드마다 스레드로 만들면 동시에 실행할 수 있다. 프로그램 하나 켜서 1 Process가 돌고 그 안에서 여러 스레드가 돈다고 생각하자. (실제로는 Process가 여러개일 수도 있지만..)
+
+**결국 이 하드웨어 스레드와 소프트웨어 스레드가 각각 의미하는 것이 다르기 때문에 1 core 1 thread CPU 에서도 하드웨어 스레드가 여러 개라면 (인텔의 [하이퍼 스레딩](https://www.intel.co.kr/content/www/kr/ko/gaming/resources/hyper-threading.html)이라던가) OS는 해당 스레드 갯수 만큼의 코어가 있다고 판단하고 해당 자원에 맞춰서 소프트웨어적 스레드를 스케줄링한다.**
+
+예를 들어 2 core에 4 thread라면 하드웨어적으로는 4개(2 \* 2)의 하드웨어 스레드가 존재한다는 말이고, OS는 마치 4개의 코어가 있는 것처럼 인식한다. 여기에 소프트웨어 스레드 8개를 돌리고자 한다면 균등 분배하여 각 코어마다 2개의 소프트웨어 스레드를 스케쥴링할 것이다.
 
 ## 동시성과 병렬성
 
@@ -74,9 +126,11 @@
 - sync, async
   - sync : 작업 완료 여부를 호출한 쪽이 커널한테 물어본다면
     - "일 다 됐어요?" 즉, 주기적으로 물어봐야 한다.
+    - 동기 처리시 실행 순서가 보장됨
   - async : 작업 완료 여부를 커널이 호출한 쪽에 알려준다면
     - "야 일 다 됐다"
     - 작업이 완료되면 callback을 호출해서 알려주는 방식이 대표적 패턴
+    - 비동기 처리시 실행 순서가 보장되지 않음
 
 ### 2x2 matrix로 설명
 
@@ -94,6 +148,7 @@
 
 - I/O bound가 느린 이유는 대개 작업을 위해 작동해야 하는 기기의 차이로 인한 latency 때문이다. [Latency Numbers Every Programmer Should Know](https://gist.github.com/sergekukharev/ccdd49d23a5078f108175dc71ad3c06c)를 참고하고, [memory hierarchy](https://www.geeksforgeeks.org/memory-hierarchy-design-and-its-characteristics/)에 근거하면 cpu > memory > disk의 속도임을 확인할 수 있다.
 
+  - 이것이 I/O bound 작업의 `유휴 시간`을 발생시키는 원인이다.
   - 그래서 입출력 집중 프로세스는 실행 상태보다는 입출력을 위한 대기 상태에 더 많이 머무르게 된다. 반대로 CPU 집중 프로세스는 대기 상태보다는 실행 상태에 더 많이 머무르게 된다. 그래서 보통 I/O bound process가 CPU bound process보다 우선순위가 높다.
 
   - CPU는 하나다. (core는 여러개지만.) 희소한 자원인 까닭에 운영체제는 프로세스마다 우선순위 priority를 부여하고 관리한다. 운영체제는 각 프로세스의 PCB에 우선순위를 명시하고, PCB에 적힌 우선순위를 기준으로 먼저 처리할 프로세스를 결정한다.
@@ -133,6 +188,22 @@ node.js 공홈의 유명한 글인 [dont-block-the-event-loop](https://nodejs.or
 ## actor model
 
 작성 예정...
+
+## green thread
+
+앞서 살펴본 thread는 os thread, 즉 os 레벨의 스레드를 말한다.  
+그러나 green thread(micro thread라 부르기도 함)는 `애플리케이션 단의 thread`이다.  
+언어마다 세부 구현이 다르기 때문에 주력 언어별로 각자 살펴봐야할 것 같다.
+
+### threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법
+
+multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:1 방식으로 매핑되는 언어가 있다. 이런 언어는 java, c# 등이 그러하다.
+
+> 이 글을 쓰는 2022년 9월 말 시점에는 [Java 19에서 virtual thread](https://blogs.oracle.com/javamagazine/post/java-loom-virtual-threads-platform-threads) 관련 이야기가 나오고 있다. 필자는 java를 사용하지는 않지만 관련 내용을 관심 있는 분들은 디깅해보셔도 좋으실 것 같다. (글 쓰는 사람은 잘 모르겠다는 말이다. )
+
+그 외 다른 언어는 1:n 방식, m:n으로 매핑하는 경우도 있다. 예를 들어 python은 1:n이다. 여러 thread를 써도 GIL로 인해서 실제로는 하나의 OS 스레드만 사용하게 된다.
+
+### 적절한 thread pool size
 
 ## coroutine
 
