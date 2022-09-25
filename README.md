@@ -112,7 +112,7 @@
 
 작성 예정...
 
-[node.js의 dont-block-the-event-loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)은 다중 접속 하에 오는 여러 client들의 요청을 처리하는 스레드가 blocking 방식의 처리를 하면 성능 처하가 일어날 수 있다고 설명하고 있다.
+node.js 공홈의 유명한 글인 [dont-block-the-event-loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)은 다중 접속 하에 오는 여러 client들의 요청을 처리하는 스레드가 blocking 방식의 처리를 하면 성능 처하가 일어날 수 있다고 설명하고 있다.
 
 프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?
 
