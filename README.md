@@ -1,6 +1,6 @@
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
-- [concurrency, parallelism, thread, process, actor, LWT, web-worker](#concurrency-parallelism-thread-process-actor-lwt-web-worker)
+- [동시성을 향한 여정](#동시성을-향한-여정)
   - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
   - [동시성과 병렬성](#동시성과-병렬성)
   - [multi-threading & multi-processing](#multi-threading--multi-processing)
@@ -28,7 +28,7 @@
 
 ---
 
-# concurrency, parallelism, thread, process, actor, LWT, web-worker
+# 동시성을 향한 여정
 
 ## 하드웨어적 스레드와 소프트웨어적 스레드
 
