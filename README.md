@@ -11,7 +11,11 @@
   - [CPU bound, I/O bound](#cpu-bound-io-bound)
   - [network I/O를 이해하기 위한 socket 및 다중 접속 처리](#network-io를-이해하기-위한-socket-및-다중-접속-처리)
     - [socket](#socket)
+      - [TCP](#tcp)
+      - [UDP](#udp)
+      - [HTTP](#http)
     - [다중 접속 처리](#다중-접속-처리)
+      - [기타 처리](#기타-처리)
       - [프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?](#프로세스를-여러-개-생성하여-다중-접속을-처리하는-것이-왜-문제가-되느냐)
     - [event-loop 모델](#event-loop-모델)
   - [actor model](#actor-model)
@@ -165,6 +169,18 @@ C --> E(user, green Thread)
 >
 > > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
 
+#### TCP
+
+작성 예정
+
+#### UDP
+
+작성 예정
+
+#### HTTP
+
+작성 예정
+
 ### 다중 접속 처리
 
 장단점 및 구현의 경제성을 고려하여 적절한 것을 선택해야겠다만 다중 접속을 처리하기 위한 여러가지 방법이 있다.
@@ -172,6 +188,8 @@ C --> E(user, green Thread)
 - connection마다 process를 생성하는 multi process 방식
 - connection마다 thread를 생성하는 multi thread 방식
 - 멀티 플렉싱
+
+#### 기타 처리
 
 #### 프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?
 

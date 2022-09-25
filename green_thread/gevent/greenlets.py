@@ -1,9 +1,7 @@
 import gevent
 
 """
-greenlet은 일종의 pesudo-threads이다.  
-green thread 혹은 micro thread라고 알려져 있으며 os단의 thread가 아니라 애플리케이션 단의 thread이다.  
-
+http://www.gevent.org/intro.html
 """
 
 def foo():
@@ -21,7 +19,7 @@ def wow():
     gevent.sleep(3)  
     print("wow done")
 
-# 알아서 스케쥴링 됨
+# http://www.gevent.org/api/gevent.html#gevent.joinall
 gevent.joinall([
     gevent.spawn(foo),
     gevent.spawn(bar),
