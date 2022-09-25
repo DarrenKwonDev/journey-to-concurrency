@@ -4,7 +4,7 @@
   - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
   - [동시성과 병렬성](#동시성과-병렬성)
   - [multi-threading & multi-processing](#multi-threading--multi-processing)
-  - [동시성에서 발생하는 공유 자원 문제](#동시성에서-발생하는-공유-자원-문제)
+  - [공유 자원 문제](#공유-자원-문제)
     - [(CPython 한정) GIL(Global Interpreter Lock)](#cpython-한정-gilglobal-interpreter-lock)
   - [blocking, non-blocking, sync, async](#blocking-non-blocking-sync-async)
     - [2x2 matrix로 설명](#2x2-matrix로-설명)
@@ -17,7 +17,7 @@
   - [actor model](#actor-model)
   - [green thread](#green-thread)
     - [threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법](#threading-model--프로그래밍-언어에서-user-thread를-os-thread와-매핑하는-방법)
-    - [적절한 thread pool size](#적절한-thread-pool-size)
+    - [적절한 thread pool size란 얼마인가](#적절한-thread-pool-size란-얼마인가)
   - [coroutine](#coroutine)
   - [golang의 goroutine](#golang의-goroutine)
   - [브라우저 런타임에서 web worker를 활용한 multi threading](#브라우저-런타임에서-web-worker를-활용한-multi-threading)
@@ -50,7 +50,7 @@ C --> E(user, green Thread)
 
 **결국 이 하드웨어 스레드와 소프트웨어 스레드가 각각 의미하는 것이 다르기 때문에 1 core 1 thread CPU 에서도 하드웨어 스레드가 여러 개라면 (인텔의 [하이퍼 스레딩](https://www.intel.co.kr/content/www/kr/ko/gaming/resources/hyper-threading.html)이라던가) OS는 해당 스레드 갯수 만큼의 코어가 있다고 판단하고 해당 자원에 맞춰서 소프트웨어적 스레드를 스케줄링한다.**
 
-예를 들어 2 core에 4 thread라면 하드웨어적으로는 4개(2 \* 2)의 하드웨어 스레드가 존재한다는 말이고, OS는 마치 4개의 코어가 있는 것처럼 인식한다. 여기에 소프트웨어 스레드 8개를 돌리고자 한다면 균등 분배하여 각 코어마다 2개의 소프트웨어 스레드를 스케쥴링할 것이다.
+예를 들어 2 core에 4 thread라면 하드웨어적으로는 4개(2 \* 2)의 하드웨어 스레드가 존재한다는 말이고, OS는 마치 4개의 코어가 있는 것처럼 인식한다. 여기에 OS 스레드 8개를 돌리고자 한다면 균등 분배하여 각 코어마다 2개의 소프트웨어 스레드를 스케쥴링할 것이다.
 
 ## 동시성과 병렬성
 
@@ -81,7 +81,7 @@ C --> E(user, green Thread)
   - single core시 사용 불가
   - multi-thread보다 overhead가 크긴 하지만 CPython 환경에서는 GIL 때문에 멀티 코어 환경을 활용하려면 multi-processing 이용이 권장됨
 
-## 동시성에서 발생하는 공유 자원 문제
+## 공유 자원 문제
 
 - 공유된 메모리 뿐만 아니라 file IO, DB 등 동시 접근 가능한 리소스는 불일치 문제에 부딪힐 수 있음.
 - multi threading에서는 stack을 제외한 모든 자원을 공유하므로, 공유 자원에 대한 동시 접근 문제가 발생할 수 있음.
@@ -110,10 +110,10 @@ C --> E(user, green Thread)
   - 알다시피 Mutex는 dead lock을 발생시킬 수 있는 요인 중 하나임. (다른 요인으론 점유/대기, 비선점 방식, 자원 할당 그래프 상 원형 대기를 들 수 있다.) 그러나 GIL은 단일 스레드만이 python object에 접근하게 제한함으로써 Mutex 사용으로 인해 발생 가능한 여러 잠재적 문제점(코더 문제지만)을 회피할 수 있게 되었다.
   - CPython에서는 단순화를 위해 정석적인 Mutex보다는 python interpreter 자체를 lock하기로 했다. 그래서 'Global Interpreter Lock'이라고 부른다.
 - GIL 바깥에서 C/C++ extension을 통해서 연산하는 방안도 있다. numpy나 scipy가 그렇게 한다.
-- 어쨌거나 CPython에서는 multi-threading을 사용하더라도 실제로는 single-threading으로 동작함. 따라서 multi-process 등의 다른 방법을 사용해야 함.
+- 어쨌거나 CPython에서는 multi-threading을 사용하더라도 실제로는 single-threading으로 동작함. user thread를 여러개 펼쳐놓아도 os thread는 한개만 돈다는 의미이다. 따라서 multi-process 등의 다른 방법을 사용해야 함.
 
-  - 공식 문서에 의하면,  
-    응용 프로그램에서 멀티 코어 기계의 계산 자원을 더 잘 활용하려면 multiprocessing이나 concurrent.futures.ProcessPoolExecutor를 사용하는 것이 좋습니다. 그러나, 여러 I/O 병목 작업을 동시에 실행하고 싶을 때 threading은 여전히 적절한 모델입니다.
+  - 공식 문서에 의하면,
+    > 응용 프로그램에서 멀티 코어 기계의 계산 자원을 더 잘 활용하려면 multiprocessing이나 concurrent.futures.ProcessPoolExecutor를 사용하는 것이 좋습니다. 그러나, 여러 I/O 병목 작업을 동시에 실행하고 싶을 때 threading은 여전히 적절한 모델입니다.
   - 부연 설명하자면, 스레드로 쪼개어 io 작업을 해야 유휴 시간을 활용할 수 있기 때문이다.
 
 ## blocking, non-blocking, sync, async
@@ -203,7 +203,9 @@ multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:
 
 그 외 다른 언어는 1:n 방식, m:n으로 매핑하는 경우도 있다. 예를 들어 python은 1:n이다. 여러 thread를 써도 GIL로 인해서 실제로는 하나의 OS 스레드만 사용하게 된다.
 
-### 적절한 thread pool size
+### 적절한 thread pool size란 얼마인가
+
+작성 예정...
 
 ## coroutine
 
