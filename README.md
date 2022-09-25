@@ -108,15 +108,23 @@
 >
 > > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
 
+### 다중 접속 처리
+
+장단점 및 구현의 경제성을 고려하여 적절한 것을 선택해야겠다만 다중 접속을 처리하기 위한 여러가지 방법이 있다.
+
+- 여러 process를 생성하여 각각의 process가 client의 요청을 처리하는 방법
+- 여러 thread를 생성하여 각각의 thread가 client의 요청을 처리하는 방법
+- 멀티 플렉싱 기반
+
+프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?
+
+과거 apache는 connection이 생성될 때마다 process를 생성하는 멀티 프로세스 방식임. process를 만드는 건 시간이 소요되는 일이므로 prefork 방식(미리 process를 만듦)으로 작동함. 문제는 클라이언트가 많이 짐에 따라 ‘동시에 연결된 커넥션'이 많아졌을 때 **C10K Problem**이 발생 (connection 1만개 문제) 커넥션을 더 이상 늘릴 수 없게 됨. 하드웨어 성능 문제가 아니었음. apache 서버가 connection이 생성될 때마다 process를 생성하는 구조이기 때문에 문제가 되는 것임. 프로세스가 많아서 메모리 부족으로 이어짐. 게다가 프로세스를 바꿔가며 일해야 하기 때문에 context switching이 자주 일어나게 되었음.
+
 ### event-loop 모델 및 다중 접속을 처리하는 방식
 
 작성 예정...
 
 node.js 공홈의 유명한 글인 [dont-block-the-event-loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)은 다중 접속 하에 오는 여러 client들의 요청을 처리하는 스레드가 blocking 방식의 처리를 하면 성능 처하가 일어날 수 있다고 설명하고 있다.
-
-프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?
-
-과거 apache는 connection이 생성될 때마다 process를 생성하는 멀티 프로세스 방식임. process를 만드는 건 시간이 소요되는 일이므로 prefork 방식(미리 process를 만듦)으로 작동함. 문제는 클라이언트가 많이 짐에 따라 ‘동시에 연결된 커넥션'이 많아졌을 때 **C10K Problem**이 발생 (connection 1만개 문제) 커넥션을 더 이상 늘릴 수 없게 됨. 하드웨어 성능 문제가 아니었음. apache 서버가 connection이 생성될 때마다 process를 생성하는 구조이기 때문에 문제가 되는 것임. 프로세스가 많아서 메모리 부족으로 이어짐. 게다가 프로세스를 바꿔가며 일해야 하기 때문에 context switching이 자주 일어나게 되었음.
 
 ## actor model
 
