@@ -211,8 +211,6 @@ C --> E(user, green Thread)
     - 한 커넥션으로 동시에 여러개의 메세지를 주고 받을 있으며, 응답은 순서에 상관없이 stream으로 주고 받는다. multiplexing은 HTTP/1.1의 Connection Keep-Alive, Pipelining의 개선이라 보면 된다.
     - http HOLB는 해결 되었지만 TCP HOLB는 미해결
       - TCP HOLB는 또 뭐냐, TCP는 데이터의 순서를 보장하는 프로토콜임. 그래서 먼저 전송되어야 하는 버퍼가 지연되면 그 뒤 버퍼도 전부 다 지연되는 걸 말함.
-      - TCP HOLB 도식화
-        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/da30e4f7-9780-4206-b221-1b6c604d112a/Untitled.png)
   - Stream Prioritization
     - 각 요청에 중요도를 부여
     - 예를 들어 image보다 css가 먼저 로드되어야 브라우저에서 렌더링이 될 터이니 css에게 높은 중요도를 부여함으로써 브라우저가 렌더링을 할 수 있게 만들기.
