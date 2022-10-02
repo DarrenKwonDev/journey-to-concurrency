@@ -10,7 +10,6 @@
     - [2x2 matrix로 설명](#2x2-matrix로-설명)
   - [CPU bound, I/O bound](#cpu-bound-io-bound)
   - [network I/O를 이해하기 위한 socket 및 다중 접속 처리](#network-io를-이해하기-위한-socket-및-다중-접속-처리)
-    - [socket](#socket)
     - [TCP](#tcp)
     - [UDP](#udp)
     - [HTTP](#http)
@@ -165,11 +164,10 @@ C --> E(user, green Thread)
 
 ## network I/O를 이해하기 위한 socket 및 다중 접속 처리
 
-### socket
-
+> socket?  
 > 소켓은 네트워크에서 서버와 클라이언트, 두 개의 프로세스가 특정 포트를 통해 양방향 통신이 가능하도록 만들어 주는 추상화된 장치입니다. 메모리의 사용자 공간에 존재하는 프로세스(서버, 클라이언트)는 커널 공간에 생성된 소켓을 통해 데이터를 송수신할 수 있습니다.
 >
-> > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
+> https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
 
 ### TCP
 
