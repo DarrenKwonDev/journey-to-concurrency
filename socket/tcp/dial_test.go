@@ -58,6 +58,6 @@ func TestDial(t *testing.T) {
 	conn.Close() // client에서 close를 요청. FIN 패킷 보냄
 	<-done
 
-	listener.Close() 
+	listener.Close() // server listener close
 	<-done
 }

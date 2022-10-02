@@ -174,29 +174,14 @@ C --> E(user, green Thread)
 두 개체 간 데이터 전송의 신뢰성 중시. 네트워크 정체 등의 이유가 발생하더라도 packet loss를 최소화하기 위해 노력함.
 
 - 3 way handshake. → 연결 수립을 위한 통신이 필요함
+
   - 이 때문에 TCP 기반 HTTP1, 2는 connection 생성 비용 문제를 겪게 됨. HTTP3가 UDP로 갈아타고 신뢰성은 애플리케이션 단에서 구현한 이유.
   - SYN -> SYN/ACK -> ACK
     - 각 패킷에 든 시퀀스 번호 등의 로우 레벨에 대한 설명은 생략
   - TCP 세션 종료 시 어느 한 쪽에서 FIN 패킷을 보내며 종료 시퀀스 진행함. (stop), 강제 종료 등 갑작스런 종료에는 RST 패킷을 보내며 종료.
 
-```go
-// 여러 유저가 서버에 수신 연결을 요청하므로 무한 for문으로 서버가 계속 수신 연결을 받을 수 있게 함.
-for {
-	// ip, port에 바인딩 된 listener가 수신 연결을 받음.
-	// 유저(client)와 서버(server) 간의 tcp 3-way handshake가 이루어짐.
-	// 이 과정은 모두 blocking임.
-	conn, err := listener.Accept()
-	if err != nil {
-		return err
-	}
-	// connection이 맺어졌으므로, 이제부터는 유저와 서버가 데이터를 주고받을 수 있음.
-	// main thread에서 모든 유저의 요청을 받아 처리할 수 없으므로 goroutine을 생성하여 처리함.
-	go func(c net.Conn) {
-		defer c.Close() // FIN packet
-		// ...
-	}(conn)
-}
-```
+- Dial 시 적절한 timeout을 설정하여 빠르게 실패하도록 할 것
+-
 
 ### UDP
 
