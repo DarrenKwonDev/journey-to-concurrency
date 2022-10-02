@@ -11,11 +11,13 @@
   - [CPU bound, I/O bound](#cpu-bound-io-bound)
   - [network I/O를 이해하기 위한 socket 및 다중 접속 처리](#network-io를-이해하기-위한-socket-및-다중-접속-처리)
     - [socket](#socket)
-      - [TCP](#tcp)
-      - [UDP](#udp)
-      - [HTTP](#http)
+    - [TCP](#tcp)
+    - [UDP](#udp)
+    - [HTTP](#http)
+      - [HTTP 1.1](#http-11)
+      - [HTTP 2.0](#http-20)
+      - [HTTP 3.0 (2020)](#http-30-2020)
     - [다중 접속 처리](#다중-접속-처리)
-      - [기타 처리](#기타-처리)
       - [프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?](#프로세스를-여러-개-생성하여-다중-접속을-처리하는-것이-왜-문제가-되느냐)
     - [event-loop 모델](#event-loop-모델)
   - [actor model](#actor-model)
@@ -169,17 +171,70 @@ C --> E(user, green Thread)
 >
 > > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
 
-#### TCP
+### TCP
 
-작성 예정
+두 개체 간 데이터 전송의 신뢰성 중시. 네트워크 정체 등의 이유가 발생하더라도 packet loss를 최소화하기 위해 노력함.
 
-#### UDP
+- 3 way handshake. → connection 연결이 필요
+- 이 때문에 TCP 기반 HTTP1, 2는 connection 생성 비용 문제를 겪게 됨. HTTP3가 UDP로 갈아타고 신뢰성은 애플리케이션 단에서 구현한 이유.
 
-작성 예정
+### UDP
 
-#### HTTP
+- connectionless라서 connection 생성 비용이 없음. 대신 신뢰성이 떨어짐
+- 비교적 데이터의 신뢰성이 중요하지 않을 때 사용함.
 
-작성 예정
+### HTTP
+
+#### HTTP 1.1
+
+- keep-alive
+  - HTTP 1.0은 매 요청 마다 3 way handshake로 연결을 맺어야 해서 latency가 높았음. 그래서 TCP connection을 지속해서 재활용 할 수 있게 함.
+    - connection 생성은 오래 걸리는 일임.
+  - 다만 connection 수립에 의한 latency를 해결할 수 있었을 뿐이지 **병렬적인 요청-응답은 불가능했음**. 따라서 다량의 멀티미디어 리소스를 처리 해야하는 웹페이지에서 pageload가 느렸음.
+    keep-alive로 tcp connection 재활용은 가능하지만 요청과 응답이 순차적으로 이루어져 느렸음.
+- **pipelining과 HOL (head-of-line) blocking(HOLB)**
+  - 위 병렬 요청-응답이 불가능함에 따라 성능 개선을 위하여 pipelining 기술을 사용하게 됨
+    - 정말 단순한게, 그냥 지난 요청에 대한 응답을 기다리지 않고 여러번 요청을 보내면 서버에서 들어온 순서대로 (FIFO, 큐) 응답을 내려 보내주는 것이다.
+  - 성능 개선이 이루어졌기는 했지만 http HOLB 문제를 야기하였음. **들어온 순서대로 응답을 내려보내 준다는 것은 첫 요청이 매우 느리다면 뒤 이어 들어온 요청에 대한 연산이 끝났음에도 응답으로 내려줄 수 없다는 것**이다.
+  - HOLB 문제로 인하여 그래서 모던 브라우저들은 대부분은 파이프라이닝을 사용하지 못하도록 막아 놓았음.
+- HTTP 1.1 단점 극복을 위해 구글에서 SPDY 프로토콜을 새로 구현하였으나 이제는 deprecated 됨. 구글 당사자도 안 씀.
+
+#### HTTP 2.0
+
+- HTTP 2.0
+  - 모던 브라우저는…
+    - 처음부터 여러 개의 tcp connection을 생성해놓고 병렬적으로 처리함.
+      - 몇 개나 생성하느냐는 정책은 브라우저마다 다른데 6개가 일반적임.
+  - `multiplexing`
+    - multiplexing의 뜻 → 단일 연결 안에서 여러 데이터가 섞이지 않게 전송하는 기법. → 병렬 처리를 위해 중요함.
+    - 즉, 하나의 TCP connection에 여러 데이터를 병렬적으로 처리할 수 있게 된 것임.
+    - 한 커넥션으로 동시에 여러개의 메세지를 주고 받을 있으며, 응답은 순서에 상관없이 stream으로 주고 받는다. multiplexing은 HTTP/1.1의 Connection Keep-Alive, Pipelining의 개선이라 보면 된다.
+    - http HOLB는 해결 되었지만 TCP HOLB는 미해결
+      - TCP HOLB는 또 뭐냐, TCP는 데이터의 순서를 보장하는 프로토콜임. 그래서 먼저 전송되어야 하는 버퍼가 지연되면 그 뒤 버퍼도 전부 다 지연되는 걸 말함.
+      - TCP HOLB 도식화
+        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/da30e4f7-9780-4206-b221-1b6c604d112a/Untitled.png)
+  - Stream Prioritization
+    - 각 요청에 중요도를 부여
+    - 예를 들어 image보다 css가 먼저 로드되어야 브라우저에서 렌더링이 될 터이니 css에게 높은 중요도를 부여함으로써 브라우저가 렌더링을 할 수 있게 만들기.
+  - header compression
+    - HTTP 헤더 압축을 통해 트래픽을 보다 효율적으로 전송
+  - server push
+    - 서버는 클라이언트의 요청에 대해 요청하지도 않은 리소스를 마음대로 보내줄 수 도 있다.
+    - 그러니까 html 파싱 해나가면서 css나 script를 만나게 되면 해당 내용을 요청하는 방식이지만 HTTP 2.0에선 없어도 서버단에서 push해서 넣을 수 있다는 것이다. 이를 **PUSH_PROMISE**라 한다. HTTP 2.0 프레임을 보자.
+    - 서버가 요청받지 않은 리소스도 클라이언트로 보낼 수 있도록 서버 푸시에 대한 지원이 추가
+- **HTTP 1.1과의 성능 차이는 꽤나 dramatic하므로 성능을 생각한다면 꼭 HTTP 버전을 높게.**
+- HTTP/2 protocol을 지원하지 않는 브라우저는 이제 없다고 봐도 됨. [https://caniuse.com/http2](https://caniuse.com/http2)
+
+- HTTPS와 HTTP/2는 다른 개념이지만 같이 사용된다.
+  - HTTP/2 프로토콜에 반드시 SSL/TLS로 보안된 연결을 사용해야 하는 것은 아니지만 많은 HTTP/2 클라이언트가 HTTP/2 사용 시 반드시 암호화된 연결을 사용하도록 하고 있기 때문에 그렇다.
+
+#### HTTP 3.0 (2020)
+
+- TCP HOLB 문제가 생긴다. 이게 다 TCP 때문이다. UDP를 사용하자.
+  - UDP는 TCP와 다르게 신뢰성이 없다고 들었다. → 어프릴케이션 계층에서 신뢰성을 구현하자.
+  - 독립 stream
+- It uses QUIC instead of TCP for the underlying transport protocol, thus removing HOL blocking in the transport layer.
+  - QUIC is based on UDP. It introduces streams as first-class citizens at the transport layer. QUIC streams share the same QUIC connection, so no additional handshakes and slow starts are required to create new ones. But QUIC streams are delivered independently such that in most cases packet loss affecting one stream doesn't affect others.
 
 ### 다중 접속 처리
 
@@ -187,9 +242,8 @@ C --> E(user, green Thread)
 
 - connection마다 process를 생성하는 multi process 방식
 - connection마다 thread를 생성하는 multi thread 방식
-- 멀티 플렉싱
-
-#### 기타 처리
+- multiplexing
+  - 단일 연결 안에서 여러 데이터가 섞이지 않게 전송하는 기법. 하나의 TCP connection에 여러 데이터를 병렬적으로 처리할 수 있게 된 것임.
 
 #### 프로세스를 여러 개 생성하여 다중 접속을 처리하는 것이 왜 문제가 되느냐?
 
