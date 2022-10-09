@@ -48,13 +48,13 @@
 
   - `프로세스(process)`
     - 두 프로그램이 같은 메모리 주소를 사용하여 발생하는 [race condition](https://en.wikipedia.org/wiki/Race_condition)을 방지하기
-    - 각 프로그램은 격리되어 고유한 메모리 공간을 사용해야함
+      - 각 프로그램은 격리되어 고유한 메모리 공간을 사용해야함
       - 각 프로그램이 소통하기 위해선 message를 넘김으로써만 가능해야함
       - 각 프로그램을 식별할 unique identifier가 필요함
     - 위 조건을 충족하기 위해서 프로그램을 `프로세스(process)`단위로 나누고, PID를 부여하였다.
   - `스레드(thread)`
     - 프로그램 중 일부분이 concurrent하게 동작하길 바랄 수 있다.
-    - 각 thread가 생성될 때마다 stack를 가지고 있으므로 heap, data, code 부분은 공유하므로 공유 자원에 대한 접근 문제로 process와 달리 race condition이 발생한다.
+    - 각 thread가 마다 stack을 따로 가지고 있고 프로세스 내 heap, data, code 부분은 공유하므로 공유 자원에 대한 접근 문제로 process와 달리 race condition이 발생한다.
     - thread에 대한 자세한 설명은 multi-threading & multi-processing 파트에서 후술한다.
   - 결국 스케쥴링과 스케쥴링 큐(말만 큐이지 FIFO의 큐와는 거리가 있는)의 문제로 귀결된다. 이는 OS 다루는 글에서 후술.
 

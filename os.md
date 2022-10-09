@@ -111,6 +111,15 @@ context switching이이 워낙 빠르기 때문에 동시에 실행되는 것처
 
 예를 들어, 사용자가 bash 셸에서 ls라는 명령어를 쳤다고 가정해 봅시다. 셸 프로세스는 fork를 통해 자신과 동일한 프로세스를 생성하고, 그로부터 탄생한 자식 프로세스(셸의 복제 프로세스)는 exec를 통해 ls 명령어를 실행하기 위한 프로세스로 전환되어 실행됩니다.
 
+### 프로세스 간의 통신 (IPC, Inter-Process communication)
+
+프로세스는 각자 격리되어 있으며 다른 메모리 주소를 사용하여 race condition을 발생시키는 것을 미연에 방지하고 서로 간의 소통은 메세지를 전달하는 방식으로 이루어진다고 언급한 바 있다.
+
+... 작성 예정
+
+[Inter-process communication: files](https://dev.to/leandronsp/inter-process-communication-files-1m34)  
+[File Descriptor](https://bottomupcs.com/ch01s03.html)
+
 ### 스레드
 
 ```mermaid
@@ -433,6 +442,20 @@ CPU가 쉴새 없이 프로세스를 실행해야 컴퓨터 전체의 생산성�
 하나의 프로세스가 실제로 얼마나 많은 프레임이 필요할지는 결국 실행해 봐야 아는 경우가 많습니다. 크게 작업 집합 모델 working set model을 사용하는 방식과 페이지 폴트 빈도 PFF; Page-Fault Frequency를 사용하는 방식이 있습니다.
 
 ## File system
+
+### FD(file descriptor)
+
+- 파일을 열면(새로 생성하는 것 포함), OS 커널은 해당 파일에 대한 stream을 생성하고 해당 파일과 연결합니다. 해당 stream을 지칭하기 위하여 임의의 수를 부여하여 process에게 반환합니다. 이 값을 file descriptor라 합니다.
+  - 그런데 리눅스에선 모든 게 파일입니다. fd를 조회해보면 REG, DIR, CHR 등의 여러 타입으로 표현됩니다.
+- 간단히 말하자면 `열려 있는 파일의 식별자`입니다.
+- 좀 더 세련되게 설명을 하자면, 유저는 직접 커널을 직접 제어하지 않고 syscall을 통해 간접적으로 fd를 경유하여 파일 시스템에 접근하므로 파일에 접근하기 위한 일종의 추상화된 인터페이스라 보아도 됩니다.
+- unix-like OS에서는 기본적으로 stdin, stdout, stderr에 각각 0, 1, 2의 fd를 부여하였습니다.
+- fd 확인해보기
+  ```bash
+  sleep 1000 & # background 실행, pid가 반환됨
+  jobs -l # 실행된 job의 pid 확인
+  lsof -p $num # pid 기반으로 lsof 확인. FD와 TYPE 확인 가능
+  ```
 
 ### file & directory
 
