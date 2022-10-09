@@ -111,15 +111,6 @@ context switching이이 워낙 빠르기 때문에 동시에 실행되는 것처
 
 예를 들어, 사용자가 bash 셸에서 ls라는 명령어를 쳤다고 가정해 봅시다. 셸 프로세스는 fork를 통해 자신과 동일한 프로세스를 생성하고, 그로부터 탄생한 자식 프로세스(셸의 복제 프로세스)는 exec를 통해 ls 명령어를 실행하기 위한 프로세스로 전환되어 실행됩니다.
 
-### 프로세스 간의 통신 (IPC, Inter-Process communication)
-
-프로세스는 각자 격리되어 있으며 다른 메모리 주소를 사용하여 race condition을 발생시키는 것을 미연에 방지하고 서로 간의 소통은 메세지를 전달하는 방식으로 이루어진다고 언급한 바 있다.
-
-... 작성 예정
-
-[Inter-process communication: files](https://dev.to/leandronsp/inter-process-communication-files-1m34)  
-[File Descriptor](https://bottomupcs.com/ch01s03.html)
-
 ### 스레드
 
 ```mermaid
@@ -160,15 +151,16 @@ A(Thread) --> C(소프트웨어적 스레드)
 
 스레드들은 각기 다른 스레드 ID, 프로그램 카운터 값을 포함한 레지스터 값, 스택을 가질 뿐 프로세스가 가지고 있는 자원을 공유합니다. 즉, 같은 프로세스 내의 모든 스레드는 아래 그림처럼 동일한 주소 공간의 코드, 데이터, 힙 영역을 공유하고, 열린 파일과 같은 프로세스 자원을 공유합니다. 여러 프로세스를 병행 실행하는 것보다 메모리를 더 효율적으로 사용할 수 있겠지요.
 
-#### 프로세스 간에는 자원 공유 안하냐?
+### 프로세스 간의 통신 (IPC, Inter-Process communication)
 
-프로세스간 통신인 IPC(inter process communication) 있음.
-
-근데 이게 직접적으로 데이터를 주고 받는 것도 있지만, 그냥 한 파일을 동시에 활용하면 그것도 통신으로 친다.
-
-더 나아가 프로세스들은 서로 공유하는 메모리 영역을 두어 데이터를 주고받을 수 있습니다. 프로세스들이 공유할 수 있는 메모리 영역을 **공유 메모리(shared memory)**라고 합니다.
-
-이 외에도 프로세스들은 소켓, 파이프 등을 통해 통신할 수 있습니다.
+- file
+  - 한 파일을 동시에 활용하면 그것도 통신으로 친다.
+- shared memory
+- pipe
+- socket
+- message queue
+- memory map
+- RPC
 
 ## CPU 스케쥴링
 
@@ -456,6 +448,8 @@ CPU가 쉴새 없이 프로세스를 실행해야 컴퓨터 전체의 생산성�
   jobs -l # 실행된 job의 pid 확인
   lsof -p $num # pid 기반으로 lsof 확인. FD와 TYPE 확인 가능
   ```
+
+[File Descriptor](https://bottomupcs.com/ch01s03.html)
 
 ### file & directory
 
