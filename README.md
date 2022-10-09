@@ -1,6 +1,7 @@
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 - [동시성을 향한 여정](#동시성을-향한-여정)
+  - [컴퓨터의 발전과 동시성](#컴퓨터의-발전과-동시성)
   - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
   - [동시성과 병렬성](#동시성과-병렬성)
   - [multi-threading & multi-processing](#multi-threading--multi-processing)
@@ -35,6 +36,34 @@
 
 # 동시성을 향한 여정
 
+## 컴퓨터의 발전과 동시성
+
+- 40년대 : 천공 카드 시절에는 한 번에 한 프로그램이 돌아갔다.
+
+- 50년대 : queue 기반으로 여러 작업을 FIFO 방식으로 처리할 수 있었지만, 여전히 한 번에 한 프로그램만이 돌아갔다. 한 번에 한 프로그램만이 들어간다는 것은, 특정 작업 도중 다른 작업을 할 수 없다는 것을 의미하며 이는 자연스레 cpu idle이 높다는 것이다.
+
+- 60년대 : OS의 원시 단계라 할 수 있는 라는 프로그램이 등장하였다. I/O 대기하고 있는 프로그램이 있을 경우 waiting queue에 대기하고 있는 다른 프로그램에게 CPU를 할당하여 가급적 cpu idle을 줄이고자 하였다. 결국, [시분할 시스템](https://en.wikipedia.org/wiki/Time-sharing)이 도입되었다고 할 수 있다.
+
+- 70년대 : 복잡한 형태의 OS가 등장. 여러 프로그램은 concurrency하게 구동하는 기법이 발전하였다.
+
+  - `프로세스(process)`
+    - 두 프로그램이 같은 메모리 주소를 사용하여 발생하는 [race condition](https://en.wikipedia.org/wiki/Race_condition)을 방지하기
+    - 각 프로그램은 격리되어 고유한 메모리 공간을 사용해야함
+      - 각 프로그램이 소통하기 위해선 message를 넘김으로써만 가능해야함
+      - 각 프로그램을 식별할 unique identifier가 필요함
+    - 위 조건을 충족하기 위해서 프로그램을 `프로세스(process)`단위로 나누고, PID를 부여하였다.
+  - `스레드(thread)`
+    - 프로그램 중 일부분이 concurrent하게 동작하길 바랄 수 있다.
+    - 각 thread가 생성될 때마다 stack를 가지고 있으므로 heap, data, code 부분은 공유하므로 공유 자원에 대한 접근 문제로 process와 달리 race condition이 발생한다.
+    - thread에 대한 자세한 설명은 multi-threading & multi-processing 파트에서 후술한다.
+  - 결국 스케쥴링과 스케쥴링 큐(말만 큐이지 FIFO의 큐와는 거리가 있는)의 문제로 귀결된다. 이는 OS 다루는 글에서 후술.
+
+- 그 이후 : 멀티 코어의 시대
+  - 2000년대 중반 즈음 단일 연산 유닛의 동작 속도를 높여서 연산 속도를 높이는 방식이 물리적인 한계로 인하여 불가능해졌다. 그래서 명령어를 처리하는 단위인 '코어'를 여러대 두는 것으로 발전했다. CPU 내 1 core 당 ALU, 제어 장치, register가 들어 있다.
+  - 결국, 한 CPU를 busy하게 만드는 것은 OS의 스케쥴링에 따른 것이며 concurrency의 영역이지만 여러 코어를 사용하는 것은 parallelism이다.
+
+[a-brief-history-of-modern-computers-multitasking-and-operating-systems](https://dev.to/leandronsp/a-brief-history-of-modern-computers-multitasking-and-operating-systems-2cbn)
+
 ## 하드웨어적 스레드와 소프트웨어적 스레드
 
 ```mermaid
@@ -60,6 +89,7 @@ C --> E(user, green Thread)
 ## 동시성과 병렬성
 
 - 동시성(concurrency) : 싱글 코어에서 멀티 쓰레드를 동작 시키는 방식. 따라서 동시에 실행되는 것처럼 보이는 것일 뿐임.
+  - cpu idle을 줄이고 cpu를 가급적 busy하게 task에게 할당하는 것
   - context switching이 매우 빠르게 작동하여 동시에 여러 작업을 하는 것처럼 보이는 것
 - 병렬성(parallelism) : 멀티 코어에서 멀티 쓰레드를 동작시키는 방식. 실제로 동시에 실행됨. 멀티 코어 CPU가 필요함.
 
@@ -133,7 +163,7 @@ C --> E(user, green Thread)
     - "일 다 됐어요?" 즉, 주기적으로 물어봐야 한다.
     - 동기 처리시 실행 순서가 보장됨
   - async : 작업 완료 여부를 커널이 호출한 쪽에 알려준다면
-    - "야 일 다 됐다"
+    - "야 일 다 됐다"(I/O operation is completed, the process is notified by the OS)
     - 작업이 완료되면 callback을 호출해서 알려주는 방식이 대표적 패턴
     - 비동기 처리시 실행 순서가 보장되지 않음
 
