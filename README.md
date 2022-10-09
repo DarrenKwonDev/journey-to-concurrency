@@ -290,6 +290,8 @@ C --> E(user, green Thread)
 
 node.js 공홈의 유명한 글인 [dont-block-the-event-loop](https://nodejs.org/en/docs/guides/dont-block-the-event-loop/)은 다중 접속 하에 오는 여러 client들의 요청을 처리하는 스레드가 blocking 방식의 처리를 하면 성능 처하가 일어날 수 있다고 설명하고 있다.
 
+[node-js-event-loop]https://www.korecmblog.com/node-js-event-loop/#%EA%B8%80%EC%97%90-%EB%93%A4%EC%96%B4%EA%B0%80%EA%B8%B0%EC%97%90-%EC%95%9E%EC%84%9C
+
 ## actor model
 
 작성 예정...
