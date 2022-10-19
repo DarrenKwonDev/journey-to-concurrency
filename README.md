@@ -365,7 +365,6 @@ Lock을 잡았을 때 다른 스레드들은 Wait 상태이다. 애초에 메모
 
 ### 고루틴은 무엇인가
 
-고루틴은 OS thread도 아니고 언어의 런타임에 의해 관리되는 그린 스레드도 아니다.  
 고루틴은 `go runtime에 스케쥴링되는 coroutine`이라 할 수 있다.
 해당 런타임의 스케쥴러 소스 코드는 [여기](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)서 볼 수 있다.
 
