@@ -455,7 +455,7 @@ M2 --> P2 --> G1(G1 blocking)
 
 ## 브라우저 런타임에서 web worker를 활용한 multi threading
 
-작성 예정...
+작성 예정..
 
 https://darrengwon.tistory.com/1171
 https://codersblock.com/assets/demos/web-workers/single.html -> source tabdp서 코드 확인 요망
