@@ -389,7 +389,7 @@ coroutine은 suspend하거나 reentry할 수 있는 여러 지점이 있지만 �
 
 그렇다면 쓰레드는 어떨까? 프로세스만큼은 아니지만 많은 context 정보를 저장해야 한다.
 
-> 16개의 범용 레지스터, PC(Program Counter), SP(Stack Pointer), segment 레지스터, 16개의 XMM 레지스터, FP coprocessor state, 16개의 AVX 레지스터, 모든 MSR들 등을 save/restore해야 합니다. ... (중략)
+> 16개의 범용 레지스터, PC(Program Counter), SP(Stack Pointer), segment 레지스터, 16개의 XMM 레지스터, FP coprocessor state, 16개의 AVX 레지스터, 모든 MSR들 등을 save/restore해야 합니다. ... (중략)  
 > 고루틴은 협조적으로 스케쥴링되고 교체가 일어날 때, 오직 3개의 레지스터만이 save/restore되기 위해 필요합니다. 바로 Program Counter, Stack Pointer 그리고 DX입니다. 비용은 훨씬 덜 듭니다.
 >
 > - 출처 : https://stonzeteam.github.io/How-Goroutines-Work/
@@ -404,11 +404,11 @@ blocking된 고루틴을 다른 고루틴으로 교체하고, blocking이 풀리
 
 모호하게 blocking으로 표현된 것은 사실 다음과 같다.
 
-> unbuffered 채널에 접근할 때(읽거나 쓸 때)
-> 시스템 I/O가 발생했을 때
-> 메모리가 할당되었을 때
-> time.Sleep() 코드 실행(python asyncio에서 asyncio.sleep()을 이용해 yield하는 것과 유사합니다)
-> runtime.Gosched() 코드 실행
+> unbuffered 채널에 접근할 때(읽거나 쓸 때)  
+> 시스템 I/O가 발생했을 때  
+> 메모리가 할당되었을 때  
+> time.Sleep() 코드 실행(python asyncio에서 asyncio.sleep()을 이용해 yield하는 것과 유사합니다)  
+> runtime.Gosched() 코드 실행  
 > 출처 : https://tech.ssut.me/goroutine-vs-threads/
 
 내부 코드에 따르면 go scheduler는 G, M, P란 struct를 가지고 있다. 모두 [runtime2.go](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)에 정의되어 있다.
