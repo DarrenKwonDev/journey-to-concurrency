@@ -1,10 +1,12 @@
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 - [동시성을 향한 여정](#동시성을-향한-여정)
+  - [사전 지식](#사전-지식)
   - [컴퓨터의 발전과 동시성](#컴퓨터의-발전과-동시성)
   - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
   - [동시성과 병렬성](#동시성과-병렬성)
   - [multi-threading & multi-processing](#multi-threading--multi-processing)
+  - [threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법](#threading-model--프로그래밍-언어에서-user-thread를-os-thread와-매핑하는-방법)
   - [공유 자원 문제](#공유-자원-문제)
     - [(CPython 한정) GIL(Global Interpreter Lock)](#cpython-한정-gilglobal-interpreter-lock)
   - [blocking, non-blocking, sync, async](#blocking-non-blocking-sync-async)
@@ -22,12 +24,15 @@
     - [event-loop 모델](#event-loop-모델)
   - [actor model](#actor-model)
   - [green thread](#green-thread)
-    - [threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법](#threading-model--프로그래밍-언어에서-user-thread를-os-thread와-매핑하는-방법)
-    - [적절한 thread pool size란 얼마인가](#적절한-thread-pool-size란-얼마인가)
   - [coroutine](#coroutine)
   - [golang의 goroutine](#golang의-goroutine)
+    - [고루틴은 무엇인가](#고루틴은-무엇인가)
+    - [고루틴은 왜 저렴한가](#고루틴은-왜-저렴한가)
+    - [고루틴의 쓰레드 모델](#고루틴의-쓰레드-모델)
+    - [go runtime의 고루틴 스케쥴링](#go-runtime의-고루틴-스케쥴링)
   - [브라우저 런타임에서 web worker를 활용한 multi threading](#브라우저-런타임에서-web-worker를-활용한-multi-threading)
   - [docs](#docs)
+    [docs](#docs)
 
 <!-- code_chunk_output -->
 <!-- /code_chunk_output -->
@@ -35,6 +40,11 @@
 ---
 
 # 동시성을 향한 여정
+
+## 사전 지식
+
+[operating-system](os.md)  
+[computer-structured](computer-structure.md)
 
 ## 컴퓨터의 발전과 동시성
 
@@ -59,7 +69,7 @@
   - 결국 스케쥴링과 스케쥴링 큐(말만 큐이지 FIFO의 큐와는 거리가 있는)의 문제로 귀결된다. 이는 OS 다루는 글에서 후술.
 
 - 그 이후 : 멀티 코어의 시대
-  - 2000년대 중반 즈음 단일 연산 유닛의 동작 속도를 높여서 연산 속도를 높이는 방식이 물리적인 한계로 인하여 불가능해졌다. 그래서 명령어를 처리하는 단위인 '코어'를 여러대 두는 것으로 발전했다. CPU 내 1 core 당 ALU, 제어 장치, register가 들어 있다.
+  - 2000년대 중반 즈음 단일 연산 유닛의 동작 속도를 높여서 연산 속도를 높이는 방식이 물리적인 한계로 인하여 불가능해졌다. 흔히 [The free launch is over](https://drdobbs.com/web-development/a-fundamental-turn-toward-concurrency-in/184405990)로 유명한 말과 같이 설명된다. 여튼, 그래서 명령어를 처리하는 단위인 '코어'를 여러대 두는 것으로 발전했다. CPU 내 1 core 당 ALU, 제어 장치, register가 들어 있다.
   - 결국, 한 CPU를 busy하게 만드는 것은 OS의 스케쥴링에 따른 것이며 concurrency의 영역이지만 여러 코어를 사용하는 것은 parallelism이다.
 
 [a-brief-history-of-modern-computers-multitasking-and-operating-systems](https://dev.to/leandronsp/a-brief-history-of-modern-computers-multitasking-and-operating-systems-2cbn)
@@ -85,6 +95,8 @@ C --> E(user, green Thread)
 **결국 이 하드웨어 스레드와 소프트웨어 스레드가 각각 의미하는 것이 다르기 때문에 1 core 1 thread CPU 에서도 하드웨어 스레드가 여러 개라면 (인텔의 [하이퍼 스레딩](https://www.intel.co.kr/content/www/kr/ko/gaming/resources/hyper-threading.html)이라던가) OS는 해당 스레드 갯수 만큼의 코어가 있다고 판단하고 해당 자원에 맞춰서 소프트웨어적 스레드를 스케줄링한다.**
 
 예를 들어 2 core에 4 thread라면 하드웨어적으로는 4개(2 \* 2)의 하드웨어 스레드가 존재한다는 말이고, OS는 마치 4개의 코어가 있는 것처럼 인식한다. 여기에 OS 스레드 8개를 돌리고자 한다면 균등 분배하여 각 코어마다 2개의 소프트웨어 스레드를 스케쥴링할 것이다.
+
+OS 스레드와 유저 스레드의 구별로는, OS 스레드는 OS에 의해 지원되고 관리되나 유저 스레드는 유저가 커널의 윗단에서 조작되는 스레드이다.
 
 ## 동시성과 병렬성
 
@@ -115,6 +127,30 @@ C --> E(user, green Thread)
 - multi-processing
   - single core시 사용 불가
   - multi-thread보다 overhead가 크긴 하지만 CPython 환경에서는 GIL 때문에 멀티 코어 환경을 활용하려면 multi-processing 이용이 권장됨
+
+## threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법
+
+multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:1 방식으로 매핑되는 언어가 있다.  
+이런 언어는 java, c# 등이 그러하다.
+
+> 이 글을 쓰는 2022년 9월 말 시점에는 [Java 19에서 virtual thread](https://blogs.oracle.com/javamagazine/post/java-loom-virtual-threads-platform-threads) 관련 이야기가 나오고 있다. 필자는 java를 사용하지는 않지만 관련 내용을 관심 있는 분들은 디깅해보셔도 좋으실 것 같다. (필자는 잘 모르겠다는 말이다.)
+
+그 외 다른 언어는 1:n 방식, m:n으로 매핑하는 경우도 있다. 예를 들어 python은 1:n이다. 여러 thread를 써도 GIL로 인해서 실제로는 하나의 OS 스레드만 사용하게 된다.
+
+- N:1: 여러 유저 스레드가 하나의 OS 스레드에 매핑됨
+
+  - 하나의 유저 스레드가 syscall해서 blocking되면 다른 유저 스레드들은 기다려야 함.
+  - 거의 사용되지 않는 모델
+
+- 1:1: 1개의 스레드는 1개의 OS 스레드와 일치합니다.
+
+  - 사용자 스레드 하나를 만들면 그에 따라 OS 스레드 하나가 생성
+  - 멀티코어를 활용할 수 있음
+  - 무한정 OS 스레드를 만들 순 없기 때문에 갯수를 신경 써야 함
+
+- M:N: 여러개의 OS 스레드 위에 여러개의 고루틴을 돌립니다.
+  - 여러 유저 스레드를 여러 OS 스레드에 매핑함.
+  - 컨텍스트 스위치 속도도 빠르고 멀티코어도 활용할 수 있어서 N:1, 1:1 스레드 모델의 문제점들을 해결하나 구현이 어려움
 
 ## 공유 자원 문제
 
@@ -321,25 +357,101 @@ Lock을 잡았을 때 다른 스레드들은 Wait 상태이다. 애초에 메모
 그러나 green thread(micro thread라 부르기도 함)는 `애플리케이션 단의 thread`이다.  
 언어마다 세부 구현이 다르기 때문에 주력 언어별로 각자 살펴봐야할 것 같다.
 
-### threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법
-
-multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:1 방식으로 매핑되는 언어가 있다. 이런 언어는 java, c# 등이 그러하다.
-
-> 이 글을 쓰는 2022년 9월 말 시점에는 [Java 19에서 virtual thread](https://blogs.oracle.com/javamagazine/post/java-loom-virtual-threads-platform-threads) 관련 이야기가 나오고 있다. 필자는 java를 사용하지는 않지만 관련 내용을 관심 있는 분들은 디깅해보셔도 좋으실 것 같다. (글 쓰는 사람은 잘 모르겠다는 말이다. )
-
-그 외 다른 언어는 1:n 방식, m:n으로 매핑하는 경우도 있다. 예를 들어 python은 1:n이다. 여러 thread를 써도 GIL로 인해서 실제로는 하나의 OS 스레드만 사용하게 된다.
-
-### 적절한 thread pool size란 얼마인가
-
-작성 예정...
-
 ## coroutine
 
 작성 예정...
 
 ## golang의 goroutine
 
-작성 예정...
+### 고루틴은 무엇인가
+
+고루틴은 OS thread도 아니고 언어의 런타임에 의해 관리되는 그린 스레드도 아니다.  
+고루틴은 `go runtime에 스케쥴링되는 coroutine`이라 할 수 있다.
+해당 런타임의 스케쥴러 소스 코드는 [여기](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)서 볼 수 있다.
+
+coroutine은 suspend하거나 reentry할 수 있는 여러 지점이 있지만 고루틴은 그런 지점이 없다. 대신 고루틴은 go runtime에 의해 관리된다. 고루틴이 blocking되었을 때 자동으로 다른 고루틴으료 교체하며 blocking이 끝나면 다시 실행시킨다. 즉, 런타임에 의해 효율적으로 고루틴이 관리된다. (내가 안해서 다행이다!)
+
+예를 들어, 네트워크로 어떤 데이터를 받던가, I/O를 위해 시스템 콜을 호출해야할 때, Go언어에서는 blocking 상태로 보고, 기다리는 다른 고루틴과 교체한다.
+
+원래 io bound 작업은 유휴 시간 때문에 대기 시간이 길고, 이 유휴 시간을 효율적으로 사용하기 위해(그 동안 다른 작업을 하기 위해) event loop 등을 사용하는 등의 방법을 활용한다. python asyncio로 그러한 맥락으로 이해할 수 있다. 그 다양한 방법 중 go runtime은 고루틴을 교체함으로써 I/O 유휴 시간을 효율적으로 사용하는 것이다.
+
+### 고루틴은 왜 저렴한가
+
+쓰레드를 만들고, 없애고, switching하는 비용은 비싸다. 왜냐하면 쓰레드는 OS로부터 메모리 공간 등의 리소스를 요청해야 하고 작업이 끝나면 리소스를 돌려줘야 하기 때문이다. 이게 끝이 아니라 쓰레드 간 메모리 공간을 침범하는 문제를 방지 하기 위해 guard 영역을 두는데 이게 또 메모리 영역을 잡아 먹는다.
+
+그러나 고루틴은 런타임에서 만들어지고 제거되는 작업들이 매우 저렴한 편이다.
+왜인가? 쓰레드는 아니지만 프로세스가 context switching하는 것을 생각해보자.
+프로세스 A에서 프로세스 B로 스위칭했다가 다시 돌아오는 과정을 순차적으로 나열하면 다음과 같다.
+
+```text
+프로세스 A 실행 -> A의 context를 A의 PCB에 저장 -> B의 PCB에서 context를 불러옴 -> 프로세스 B 실행 -> 프로세스 B의 context를 B의 PCB에 저장 -> A의 PCB에서 context를 다시 불러옴 -> 프로세스 A 실행
+```
+
+그렇다면 쓰레드는 어떨까? 프로세스만큼은 아니지만 많은 context 정보를 저장해야 한다.
+
+> 16개의 범용 레지스터, PC(Program Counter), SP(Stack Pointer), segment 레지스터, 16개의 XMM 레지스터, FP coprocessor state, 16개의 AVX 레지스터, 모든 MSR들 등을 save/restore해야 합니다. ... (중략)
+> 고루틴은 협조적으로 스케쥴링되고 교체가 일어날 때, 오직 3개의 레지스터만이 save/restore되기 위해 필요합니다. 바로 Program Counter, Stack Pointer 그리고 DX입니다. 비용은 훨씬 덜 듭니다.
+>
+> - 출처 : https://stonzeteam.github.io/How-Goroutines-Work/
+
+### 고루틴의 쓰레드 모델
+
+many-to-many, M:N입니다.
+
+### go runtime의 고루틴 스케쥴링
+
+blocking된 고루틴을 다른 고루틴으로 교체하고, blocking이 풀리면 다시 넣는 방식으로 스케쥴링 된다고 설명은 했지만 약간 모호하다. 구체적으로 어떻게 동작하는 것일까?
+
+모호하게 blocking으로 표현된 것은 사실 다음과 같다.
+
+> unbuffered 채널에 접근할 때(읽거나 쓸 때)
+> 시스템 I/O가 발생했을 때
+> 메모리가 할당되었을 때
+> time.Sleep() 코드 실행(python asyncio에서 asyncio.sleep()을 이용해 yield하는 것과 유사합니다)
+> runtime.Gosched() 코드 실행
+> 출처 : https://tech.ssut.me/goroutine-vs-threads/
+
+내부 코드에 따르면 go scheduler는 G, M, P란 struct를 가지고 있다. 모두 [runtime2.go](https://github.com/golang/go/blob/master/src/runtime/runtime2.go)에 정의되어 있다.
+
+- g(고루틴) : https://github.com/golang/go/blob/master/src/runtime/runtime2.go#L407
+- m(OS thread) : https://github.com/golang/go/blob/master/src/runtime/runtime2.go#L526
+- p(프로세서, 코어) : https://github.com/golang/go/blob/master/src/runtime/runtime2.go#L609
+
+  - p는 runtime.GOMAXPROCS 갯수 만큼 생성될 수 있습니다. Go 1.5 이전에는 default가 1, 즉, 싱글 코어만 사용하게끔 되어 있었지만, Go 1.5부터는 default가 CPU 코어 수만큼 사용하게끔 되어 있습니다. 굳이 `runtime.GOMAXPROCS(runtime.NumCPU())` 꼴로 바꿀 필요가 없다는 말입니다. 그냥 기본값으로 두어도 멀티 코어로 돌아갑니다.
+  - 모든 코어를 사용하기 싫다면 runtime.GOMAXPROCS을 변경하면 됩니다.
+  - > The GOMAXPROCS variable limits the number of operating system threads that can execute user-level Go code simultaneously. There is no limit to the number of threads that can be blocked in system calls on behalf of Go code; those do not count against the GOMAXPROCS limit. This package's GOMAXPROCS function queries and changes the limit.  
+    > 출처: https://pkg.go.dev/runtime
+
+위 3가지 객체가 어떻게 협조하며 구성되는지를 도식화 해보자면 다음과 같습니다.
+프로세서에는 여러 `runqueue`가 존재합니다.
+
+```mermaid
+flowchart TB
+
+M --> P --> G1
+P --> G2
+P --> G3
+
+%% P는 GOMAXPROCS 갯수 만큼 생성 가능
+```
+
+여기서 실행 중인 고루틴이 끝나거나 blocking되었을 때는 해당 G를 다른 M에게 넘기고 P는 runqueue에서 다음 고루틴 작업을 꺼내서 처리하는 방식입니다. blocking된 G는 건네 받은 M에도 P가 붙어 있습니다. 해당 고루틴의 state를 저장하고 계속 처리하기 위함입니다. 이를 도식화해보자면 다음과 같습니다.
+
+```mermaid
+flowchart TB
+
+M1 --> P1 --> G2
+P1 --> G3
+
+M2 --> P2 --> G1(G1 blocking)
+
+%% P는 GOMAXPROCS 갯수 만큼 생성 가능
+```
+
+- https://blog.nindalf.com/posts/how-goroutines-work/
+- https://stonzeteam.github.io/How-Goroutines-Work/
+- https://tech.ssut.me/goroutine-vs-threads/
+- https://groups.google.com/g/golang-nuts/c/2IdA34yR8gQ
 
 ## 브라우저 런타임에서 web worker를 활용한 multi threading
 
