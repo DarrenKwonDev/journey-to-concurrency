@@ -11,6 +11,7 @@
     - [(CPython 한정) GIL(Global Interpreter Lock)](#cpython-한정-gilglobal-interpreter-lock)
   - [blocking, non-blocking, sync, async](#blocking-non-blocking-sync-async)
     - [2x2 matrix로 설명](#2x2-matrix로-설명)
+    - [blocking, non-blocking의 대한 응용 및 생각](#blocking-non-blocking의-대한-응용-및-생각)
   - [CPU bound, I/O bound](#cpu-bound-io-bound)
   - [network I/O를 이해하기 위한 socket 및 다중 접속 처리](#network-io를-이해하기-위한-socket-및-다중-접속-처리)
     - [TCP](#tcp)
@@ -30,7 +31,8 @@
     - [고루틴은 왜 저렴한가](#고루틴은-왜-저렴한가)
     - [고루틴의 쓰레드 모델](#고루틴의-쓰레드-모델)
     - [go runtime의 고루틴 스케쥴링](#go-runtime의-고루틴-스케쥴링)
-  - [브라우저 런타임에서 web worker를 활용한 multi threading](#브라우저-런타임에서-web-worker를-활용한-multi-threading)
+  - [브라우저 런타임에서의 동시성](#브라우저-런타임에서의-동시성)
+    - [브라우저 런타임에서 web worker를 활용한 multi threading](#브라우저-런타임에서-web-worker를-활용한-multi-threading)
   - [docs](#docs)
     [docs](#docs)
 
@@ -209,6 +211,10 @@ multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:
 - async, blocking -> 값이 들어올 때까지 기다려야하며, 작업 완료 여부를 처리하는 쪽에서 호출 프로세스로 callback해준다
 - `async, non-blocking` -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 처리하는 쪽에서 호출 프로세스로 callback해준다
 - async, non-blocking -> 값이 들어올 때까지 기다리지 않고 다른 일을 할 수 있으며, 작업 완료 여부를 호출 프로세스에서 물어봐야 함
+
+### blocking, non-blocking의 대한 응용 및 생각
+
+[node.js Overview of Blocking vs Non-Blocking](https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/)
 
 ## CPU bound, I/O bound
 
@@ -453,10 +459,15 @@ M2 --> P2 --> G1(G1 blocking)
 - https://tech.ssut.me/goroutine-vs-threads/
 - https://groups.google.com/g/golang-nuts/c/2IdA34yR8gQ
 
-## 브라우저 런타임에서 web worker를 활용한 multi threading
+## 브라우저 런타임에서의 동시성
 
 작성 예정..
 
+### 브라우저 런타임에서 web worker를 활용한 multi threading
+
+web worker나 교차 출처 iframe은 자신만의 스택, 힙, 메시지 큐를 가진다. 이는 자신만의 런타임을 가진다는 뜻이다. 이러한 특성을 이용하여 멀티 스레딩과 비슷한 동작을 구현할 수 있다.
+
+https://developer.mozilla.org/ko/docs/Web/JavaScript/EventLoop  
 https://darrengwon.tistory.com/1171
 https://codersblock.com/assets/demos/web-workers/single.html -> source tabdp서 코드 확인 요망
 
