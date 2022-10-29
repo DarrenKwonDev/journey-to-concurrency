@@ -46,7 +46,7 @@
 ## 사전 지식
 
 [operating-system](os.md)  
-[computer-structured](computer-structure.md)
+[computer-structured](computer-structure.md)  
 [network](network.md)
 
 ## 컴퓨터의 발전과 동시성
