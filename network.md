@@ -41,6 +41,7 @@ axios.get("http://localhost:3000") // javascript
   - PPDU
 - [5L]Session : session 연결 담당. 4계층 connection보다 논리적 연결
   - SPDU
+  - 5L부터 코더가 보통 작성하는 코드 레벨에서 구현되며 이전 계층은 OS에서 제공되어 syscall을 통해 사용하는게 일반적
 - [4L]Transport : 결국 데이터를 교환하는 건 실행된 응용 프로그램(프로세스)이다. 송신 프로세스와 수신 프로세스의 connection을 제공 함.
   - TPDU (datagram, segment)
   - TCP, UDP
