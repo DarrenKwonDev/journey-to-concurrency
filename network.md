@@ -6,7 +6,7 @@
   - [호스트의 네트워크 시스템 구조의 표준 : OSI 7계층](#호스트의-네트워크-시스템-구조의-표준--osi-7계층)
   - [public ip, private ip](#public-ip-private-ip)
   - [p2p 통신을 위해 NAT을 뚫는 홀펀칭(hole punching)](#p2p-통신을-위해-nat을-뚫는-홀펀칭hole-punching)
-
+  - [glossary](#glossary)
     <!-- code_chunk_output -->
     <!-- /code_chunk_output -->
 
@@ -26,13 +26,7 @@ resp, err := http.Get("https://jsonplaceholder.typicode.com/todos/1") // golang
 axios.get("http://localhost:3000") // javascript
 ```
 
-요청을 받은 서버(응답 서버)는 목적지가 서버에 맞는지, 포트가 열려 있는지 등을 체크하는 등 TCP/IP 계층을 올라가며 de-encapsulation을 통해 요청 서버에서 보낸 정보를 해석하고 받아들인다.
-
-그 과정을 모두 구체적으로 적을 순 없겠지만 **요청 서버가 보낸 byte 덩어리를 NIC 내의 buffer에 쌓아뒀다가 응답 서버가 빼간다**.
-
-> 💡 **NIC(네트워크 인터페이스 카드)**  
-> 2계층(데이터 링크 계층)의 장치입니다. 컴퓨터를 네트워크에 연결하기 위한 하드웨어 장치. 별명이 많습니다. 랜 카드, 네트워크 인터페이스 컨트롤, 네트워크 카드 등등. 여러 일을 담당하고 있지만 최대한 단순하게 요약하자면 'NIC는 물리적 주소인 MAC 주소를 가지고 있고, 목적지 MAC 주소가 다른 패킷은 그냥 버린다'고 정리할 수 있다.  
-> https://darrengwon.tistory.com/1306?category=907881
+응답 호스트는 자신에게 온 데이터에 적힌 헤더 정보를 통해 목적지가 자신이 맞는지, 해당 포트가 열려 있는지 등을 체크하는 등 TCP/IP 계층을 올라가며 de-encapsulation을 통해 요청 호스트에서 보낸 정보를 해석하고 받아들인다. 그 과정은 후술할 것이다.
 
 ## 호스트의 네트워크 시스템 구조의 표준 : OSI 7계층 개괄
 
@@ -42,17 +36,20 @@ axios.get("http://localhost:3000") // javascript
 
 - [7L]Application : 사용자가 사용하는 응용 프로그램 계층.
   - APDU
+  - FTP, telnet, SMTP, DNS, HTTP, DHCP
 - [6L]Presentation : MIME 인코딩(미디어 타입이 좀 더 친숙한 용어입니다), 암호화, 압축
   - PPDU
 - [5L]Session : session 연결 담당. 4계층 connection보다 논리적 연결
   - SPDU
 - [4L]Transport : 결국 데이터를 교환하는 건 실행된 응용 프로그램(프로세스)이다. 송신 프로세스와 수신 프로세스의 connection을 제공 함.
   - TPDU (datagram, segment)
+  - TCP, UDP
   - port. 한 호스트 내 여러 응용 프로그램을 구별하기 위한 주소
-  - 호스트의 응용 단에서 실행되는 프로세스 사이의 connection을 만들어주기 때문에 사실상 가장 중요하고 자주 마주치는 계층
+  - 호스트에서 실행되는 프로세스 사이의 connection을 만들어주기 때문에 사실상 가장 중요하고 자주 마주치는 계층
 - [3L]Network : 데이터가 올바른 경로로 갈 수 있도록 보조. Router 역할의 호스트에서 패킷은 이 계층 까지만 간다.
   - NPDU (패킷)
-  - IP. 호스트를 구별하기 위함
+  - IP, ICMP, ARP, RARP
+  - 네트워크 트래픽이 과도하게 몰려서 전송 속도가 느려지는 것을 조절하는 Congestion Control 기능도 담당
 - [2L]Data Link : 물리 매체로 받은 데이터의 Noise 등 오류에 대한 오류 제어
   - DPDU (frame)
   - LAN 카드와 이에 내장된 MAC 주소
@@ -113,3 +110,12 @@ private ip인 우리 서버가 gateway를 거쳐 naver.com에 닿는다고 해�
 - gateway는 NAT table을 보고 실 서버에게 패킷을 보낸다.
 
 ## p2p 통신을 위해 NAT을 뚫는 홀펀칭(hole punching)
+
+작성 예정
+
+## glossary
+
+💡 **NIC(네트워크 인터페이스 카드)**  
+2계층(데이터 링크 계층)의 장치입니다. 컴퓨터를 네트워크에 연결하기 위한 하드웨어 장치. 별명이 많습니다. 랜 카드, 네트워크 인터페이스 컨트롤, 네트워크 카드 등등. 여러 일을 담당하고 있지만 최대한 단순하게 요약하자면 'NIC는 물리적 주소인 MAC 주소를 가지고 있고, 목적지 MAC 주소가 다른 패킷은 그냥 버린다'고 정리할 수 있다.  
+이 이에도 **요청 호스트가 보낸 byte 덩어리를 NIC 내의 buffer에 쌓아뒀다가 응답 호스트가 빼갑니다**.
+https://darrengwon.tistory.com/1306?category=907881
