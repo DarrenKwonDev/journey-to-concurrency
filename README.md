@@ -2,6 +2,9 @@
 
 - [동시성을 향한 여정](#동시성을-향한-여정)
   - [사전 지식](#사전-지식)
+    - [OS](#os)
+    - [CS](#cs)
+    - [Network](#network)
   - [컴퓨터의 발전과 동시성](#컴퓨터의-발전과-동시성)
   - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
   - [동시성과 병렬성](#동시성과-병렬성)
@@ -45,8 +48,16 @@
 
 ## 사전 지식
 
-[operating-system](os.md)  
-[computer-structured](computer-structure.md)  
+### OS
+
+[operating-system](os.md)
+
+### CS
+
+[computer-structured](computer-structure.md)
+
+### Network
+
 [network](network.md)
 
 ## 컴퓨터의 발전과 동시성

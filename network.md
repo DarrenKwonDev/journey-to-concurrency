@@ -8,8 +8,13 @@
       - [public ip, private ip](#public-ip-private-ip)
     - [4L transport와 해당 protocol](#4l-transport와-해당-protocol)
   - [네트워크 지식 일반](#네트워크-지식-일반)
+    - [라우팅](#라우팅)
+      - [호스트, 네트워크 간 선을 어떤 식으로 연결할 수 있나?: 전용회선/교환회선](#호스트-네트워크-간-선을-어떤-식으로-연결할-수-있나-전용회선교환회선)
+      - [교환 회선을 사용한다면 어떤 방식으로 데이터를 보낼 것인지?: 데이터 교환 방식](#교환-회선을-사용한다면-어떤-방식으로-데이터를-보낼-것인지-데이터-교환-방식)
+      - [패킷의 전송 경로 설정 방법: 가상회선/데이터그램](#패킷의-전송-경로-설정-방법-가상회선데이터그램)
     - [p2p 통신을 위해 NAT을 뚫는 홀펀칭(hole punching)](#p2p-통신을-위해-nat을-뚫는-홀펀칭hole-punching)
   - [glossary](#glossary)
+  - [ref](#ref)
 
 <!-- code_chunk_output -->
 <!-- /code_chunk_output -->
@@ -147,6 +152,43 @@ TCP와 UDP 프로토콜은 OS 내부 커널에 구현되고, socket interface를
 
 ## 네트워크 지식 일반
 
+### 라우팅
+
+#### 호스트, 네트워크 간 선을 어떤 식으로 연결할 수 있나?: 전용회선/교환회선
+
+- 전용 회선 방식: 송신 호스트와 수신 호스트가 전용으로 할당된 통신 선로로 데이터를 전송
+  - 인터넷의 경우 모든 호스트 간 전용 회선을 설치할 수 없으므로 비현실적. 제한적인 용도로 활용됨.
+- 교환 회선 방식: 전송 선로 하나를 다수의 호스트가 공유한다.
+
+  - 일반적으로 인터넷에서 사용되는 방식.
+
+#### 교환 회선을 사용한다면 어떤 방식으로 데이터를 보낼 것인지?: 데이터 교환 방식
+
+- circuit switching(회선 교환)
+  - 데이터를 전송하기 전에 통신 양단 사이에 고정된 연결 경로를 설정하는 회선 교환 방식
+- message switching(메세지 교환)
+  - 전송하는 메세지마다 헤더에 목적지 주소를 표시하며, 전체 데이터를 buffer에 쌓았다가 다른 교환 시스템으로 넘기는 방식
+- package switching(패킷 교환)
+
+  - 데이터를 패킷 단위로 나누어 전송하며 각 패킷은 제각각 다른 라우팅 경로를 거쳐 수신 호스트에 도착한다.
+  - 쉬운 말로 풀자면, 모든 패킷이 동일한 경로로 가는게 아니라 제각각 다른 경로를 통해 수신 호스트에 도착한다는 것.
+  - 때문에 패킷이 순서 대로 도착하는 보장이 없고, 도착까지의 지연 시간에 대한 분포([jitter](https://medium.com/@datapath_io/what-is-acceptable-jitter-7e93c1e68f9b))가 수용할만한 수준인지, 문제가 있는 수준인지 신경써야한다. 특히 실시간 비디오 스트리밍 등과 같은 서비스에서는 jitter가 유저 경험에 유의미한 영향을 미친다.
+    > According to Cisco, jitter tolerance is as follows:  
+    > Jitter should be below 30 ms.  
+    >  Packet loss shouldn’t be more than 1%.  
+    >  Network latency should not go over 150 ms. This is the latency in one direction meaning the round trip time (RTT) would be 300 ms.
+
+#### 패킷의 전송 경로 설정 방법: 가상회선/데이터그램
+
+- 가상 회선(Virtual Circuit)
+
+  - 앞서 패킷은 각각 다른 경로를 통해 수신 호스트에 도착한다고 설명했지만 송신-수신 호스트간 마치 전용 회선을 연결한 것처럼 가상 연결을 통해 모든 패킷의 전달 경로가 동일하게 만드는 경로 설정 방법이다. 물론 전용 회선은 아니다. 데이터가 패킷으로 다 쪼개졌고, 대역폭을 독점하지 않기 때문이다.
+  - 쪼개진 데이터가 같은 회선을 통해 가기 땜누에 킷의 도착 순서가 뒤바뀌지 않는다. 순서대로 온다.
+
+- 데이터그램(Datagram)
+  - 데이터그램 방식에서는 패킷의 경로 선택이 독립적으로 이루어진다. 데이터그램 방식은 전송할 정보의 양이 적거나 상대적으로 신뢰성이 중요하지 않은 환경에서 사용된다.
+  - 데이터그램 방식에서 데이터의 도착 순서가 바뀌는 것은 흔하게 벌어지는 현상이므로 수신 호스트에서 데이터의 순서를 바로잡는 기능이 필요하다.
+
 ### p2p 통신을 위해 NAT을 뚫는 홀펀칭(hole punching)
 
 작성 예정
@@ -157,3 +199,8 @@ TCP와 UDP 프로토콜은 OS 내부 커널에 구현되고, socket interface를
 2계층(데이터 링크 계층)의 장치입니다. 컴퓨터를 네트워크에 연결하기 위한 하드웨어 장치. 별명이 많습니다. 랜 카드, 네트워크 인터페이스 컨트롤, 네트워크 카드 등등. 여러 일을 담당하고 있지만 최대한 단순하게 요약하자면 'NIC는 물리적 주소인 MAC 주소를 가지고 있고, 목적지 MAC 주소가 다른 패킷은 그냥 버린다'고 정리할 수 있다.  
 이 이에도 **요청 호스트가 보낸 byte 덩어리를 NIC 내의 buffer에 쌓아뒀다가 응답 호스트가 빼갑니다**.
 https://darrengwon.tistory.com/1306?category=907881
+
+## ref
+
+- [Backpressure explained — the resisted flow of data through software](https://medium.com/@jayphelps/backpressure-explained-the-flow-of-data-through-software-2350b3e77ce7)
+- [What is Acceptable Jitter?](https://medium.com/@datapath_io/what-is-acceptable-jitter-7e93c1e68f9b)
