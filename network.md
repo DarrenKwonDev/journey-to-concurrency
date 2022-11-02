@@ -6,6 +6,7 @@
     - [프로토콜 설계 고려사항](#프로토콜-설계-고려사항)
     - [2L Data Link](#2l-data-link)
       - [Frame 구조](#frame-구조)
+      - [MAC계층과 LLC계층](#mac계층과-llc계층)
     - [3L network와 해당 protocol](#3l-network와-해당-protocol)
       - [public ip, private ip](#public-ip-private-ip)
     - [4L transport와 해당 protocol](#4l-transport와-해당-protocol)
@@ -119,6 +120,18 @@ axios.get("http://localhost:3000") // javascript
 - 비트 프레임
   - 프레임의 시작과 끝 위치에 정의된 비트 패턴(01111110)를 flag로 사용해 프레임 단위를 구분한다.
   - 01111110 | 011101010001010100111 | 01111110
+
+#### MAC계층과 LLC계층
+
+보통 호스트간 거리에 기반하며 LAN과 WAN으로 구별하는데 이러한 규모와 환경 차이 때문에 네트워크의 동작이 달라지곤 한다. LAN 환경에서는 WAN 환경보다 효율적인 전송 관리를 통해 네트워크의 전송 효율을 극대화해야 한다. 그래서 LAN 환경에서는 네트워크 자원을 효율적으로 활용하려고 2계층의 기능을 LLC(logical link control) 계층과 MAC(medium access control) 계층으로 나누어 처리한다. MAC이 물리 계층과 가깝고, LLC가 그것보돠 더 상위 계층에 존재한다.
+
+OSI 7계층 모델에 본 2L 데이터 링크 계층의 기본 기능은 주로 LLC 계층에서 처리한다. 즉, 물리 계층에서 넘어온 정보의 Noise 처리, 오류 제어, 흐름 제어를 책임진다. 물리적 전송 매체의 특징과 연결에 대해서는 MAC 계층이 처리한다.
+
+MAC 계층은 물리적인 특성을 반영하므로 LAN의 종류에 따라 특성이 구분되며 종류도 다양하다.
+
+- CSMA/CD 방식의 LAN(Ethernet)
+- 토큰 버스 방식의 LAN
+- 토큰 링 방식의 LAN
 
 ### 3L network와 해당 protocol
 
