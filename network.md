@@ -10,7 +10,8 @@
       - [MAC계층과 LLC계층](#mac계층과-llc계층)
     - [3L network와 해당 protocol](#3l-network와-해당-protocol)
       - [IP 프로토콜(Internet Protocol)](#ip-프로토콜internet-protocol)
-      - [그 외의 프로토콜](#그-외의-프로토콜)
+      - [IPv6](#ipv6)
+      - [3계층의 그 외의 제어용 프로토콜](#3계층의-그-외의-제어용-프로토콜)
       - [public ip, private ip](#public-ip-private-ip)
       - [혼잡 제어](#혼잡-제어)
     - [4L transport와 해당 protocol](#4l-transport와-해당-protocol)
@@ -168,9 +169,16 @@ MAC 계층은 물리적인 특성을 반영하므로 LAN의 종류에 따라 특
 - 패킷 분할/병합 기능을 수행하기도 한다.
 - Best Effort 원칙에 따라 전송함. 이는 수신 호스트에 패킷이 반드시 도착하는 것을 보장하지 않아 전송 오류 제어를 상위 계층에서 해결해야 한다.
 
-#### 그 외의 프로토콜
+#### IPv6
 
-IP 프로토콜은 호스트를 식별하기 위한 프로토콜이지만 이것만으론 안정적으로 통신할 수 없다. 그래서 통신을 위해 추가적 정보를 얻기 위한 ARP, RARP 프로토콜과 송신 호스트에게 에러 메세지를 전달하는 ICMP 프로토콜 등이 부가적으로 동반되곤 한다.
+IPv4는 32비트인데 IPv6는 128비트로 주소 공간 확장. 추가로 헤더 구조 단순화, 흐름 제어 기능이 추가 됨.  
+16비트 숫자 8개로 구성되며 콜론(:)으로 구분함. ex) D1D1:1111:3F3F:1700:4545:1212:1111:1231  
+IPv4와 함께 사용하는 환경에서 v4 버전 주소를 X:X:X:X:X:X:d, d, d, d 꼴로 표현하기도.  
+[Hello IPv6: a minimal tutorial for IPv4 users](https://metebalci.com/blog/hello-ipv6/)
+
+#### 3계층의 그 외의 제어용 프로토콜
+
+IP 프로토콜은 호스트를 식별 및 데이터 전송을 위한 프로토콜이지만 이것만으론 안정적으로 통신할 수 없다. 그래서 통신을 위해 추가적 정보를 얻기 위한 ARP, RARP 프로토콜과 송신 호스트에게 에러 메세지를 전달하는 ICMP 프로토콜 등이 부가적으로 동반되곤 한다.
 
 - ARP(Address Resolution Protocol)
 
@@ -350,3 +358,4 @@ https://darrengwon.tistory.com/1306?category=907881
 
 - [Backpressure explained — the resisted flow of data through software](https://medium.com/@jayphelps/backpressure-explained-the-flow-of-data-through-software-2350b3e77ce7)
 - [What is Acceptable Jitter?](https://medium.com/@datapath_io/what-is-acceptable-jitter-7e93c1e68f9b)
+- [Hello IPv6: a minimal tutorial for IPv4 users](https://metebalci.com/blog/hello-ipv6/)
