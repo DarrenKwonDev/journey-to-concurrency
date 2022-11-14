@@ -284,7 +284,7 @@ TCP/IP 모델에서는 보통 transport 계층 상위(session, presentation, app
 
 #### Session
 
-- 세션은 사용자 관점에서의 연결이다. transport 계층의 connection과 다른 점은, 연결된 사용자를 논리적으로 식별해낼 수 있다는 것이다. 예를 들어, TCP connection을 맺고 파일 전송 도중 연결이 끊겼다가 다시 돌아 왔을 때 세션으로 유저를 식별할 수 있다면 이전 파일 전송을 이어서 할 수 있다. 세션이 없다면 처음부터 받아야 한다.
+- 세션은 사용자 관점에서의 연결이다. transport 계층의 connection과 다른 점은, 연결된 사용자를 논리적으로 식별해낼 수 있다는 것이다. 예를 들어, UDP connection을 맺고 파일 전송 도중 연결이 끊겼다가 다시 돌아 왔을 때 세션으로 유저를 식별할 수 있다면 이전 파일 전송을 이어서 할 수 있다. 세션이 없다면 처음부터 받아야 한다.
 
   - 이는 '동기'(synchronization)와 '재동기'(re-synchronization)이란 세션 계층의 기능을 풀어 설명한 것이다. 재동기란, 세션 연결을 통해 데이터를 주고 받아 오류가 발생했을 때 동기점으로 복구하는 기능이다.
 
@@ -302,7 +302,11 @@ TCP/IP 모델에서는 보통 transport 계층 상위(session, presentation, app
 
 #### Presentation
 
+end-to-end 연결에서 전송되는 데이터의 표현 방식을 다룬다. 하다못해 간단한 텍스트도 ASCII 방식과 EBCDIC 방식이 다르다. 또한 데이터의 압축 기능도 수행한다.
+
 #### Application
+
+응용 프로그램.
 
 ## 네트워크 지식 일반
 
