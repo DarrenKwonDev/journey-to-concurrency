@@ -16,9 +16,14 @@
       - [혼잡 제어](#혼잡-제어)
     - [4L transport와 해당 protocol](#4l-transport와-해당-protocol)
       - [transport 계층 개괄](#transport-계층-개괄)
-      - [TCP](#tcp)
-      - [UDP](#udp)
-      - [Reliable UDP](#reliable-udp)
+      - [TCP(Transmission Control Protocol)](#tcptransmission-control-protocol)
+      - [UDP(User datagram protocol)](#udpuser-datagram-protocol)
+      - [Reliable UDP(RUDP)](#reliable-udprudp)
+    - [상위 계층(session, presentation, application)](#상위-계층session-presentation-application)
+      - [Session](#session)
+        - [세션 연결](#세션-연결)
+      - [Presentation](#presentation)
+      - [Application](#application)
   - [네트워크 지식 일반](#네트워크-지식-일반)
     - [라우팅](#라우팅)
       - [호스트, 네트워크 간 선을 어떤 식으로 연결할 수 있나?: 전용회선/교환회선](#호스트-네트워크-간-선을-어떤-식으로-연결할-수-있나-전용회선교환회선)
@@ -30,7 +35,7 @@
       - [internetwork](#internetwork)
     - [데이터 전송(Transmission)](#데이터-전송transmission)
       - [(유니|멀티)(포인트|캐스팅)](#유니멀티포인트캐스팅)
-    - [홀펀칭(hole punching)](#홀펀칭hole-punching)
+    - [홀펀칭(hole punching), STUN](#홀펀칭hole-punching-stun)
     - [HTTP](#http)
       - [HTTP 1.1](#http-11)
       - [HTTP 2.0](#http-20)
@@ -49,7 +54,7 @@
 
 한 컴퓨터와 다른 컴퓨터가 소통하는 것. 해당 소통의 규칙을 프로토콜이라 한다.  
 text protocol인 http, smtp, irc는 디버깅하기 편하고 텍스트 쓰는 그대로 다룰 수 있다.  
-하지만 대부분 프로토콜은 binary protocol이고 이들을 디버깅하기 위해서는 wireshark, termshark, tcpdump와 같은 패킷 분석 도구가 필요하다.
+하지만 대부분 프로토콜은 binary protocol이고 이들을 디버깅하기 위해서는 wireshark, [termshark](https://github.com/gcla/termshark), [tcpdump](https://www.tcpdump.org/)와 같은 패킷 분석 도구가 필요하다.
 
 종종 80(http), 443(https)는 생략되지만 우리가 다른 서버로 요청을 보낼 때, ip:port 적어 요청을 보낸다. 이는 요청 서버에서 다른 서버에 접촉할 때 최소한 ip와 port가 필요하다는 것이다.
 (사실 정확하게는 송신 호스트, 수신 호스트의 mac, ip, port가 모두 필요하지만 우선은 간략하게 생각하자)
@@ -246,26 +251,58 @@ ip가 호스트를 구별하기 위한 식별자라면 port는 네트워크 요�
 
 IP 프로토콜 위에서 동작하는 TCP와 UDP 프로토콜은 OS 내부 커널에 구현되고, socket interface를 통해 사용자가 사용할 수 있도록 제공된다. TCP는 연결형 서비스이며 UDP는 비연결형 서비스이다.
 
-#### TCP
+#### TCP(Transmission Control Protocol)
 
-두 개체 간 데이터 전송의 신뢰성 중시. 네트워크 정체 등의 이유가 발생하더라도 packet loss를 최소화하기 위해 노력함.
+두 호스트 간 데이터 전송의 신뢰성 중시. 네트워크 정체 등의 이유가 발생하더라도 packet loss를 최소화하기 위해 노력함.
 
-- 3 way handshake. → 연결 수립을 위한 통신이 필요함
+- 호스트 내 네트워크 커넥션 수립을 요청/수신하는 프로세스간 3 way handshake.
 
-  - 이 때문에 TCP 기반 HTTP1, 2는 connection 생성 비용 문제를 겪게 됨. HTTP3가 UDP로 갈아타고 신뢰성은 애플리케이션 단에서 구현한 이유.
   - SYN -> SYN/ACK -> ACK
-    - 각 패킷에 든 시퀀스 번호 등의 로우 레벨에 대한 설명은 생략
+  - 이 때문에 TCP 기반 HTTP1, 2는 connection 생성 비용 문제를 겪게 됨. HTTP3가 UDP로 갈아타고 신뢰성은 애플리케이션 단에서 구현한 이유.
   - TCP 세션 종료 시 어느 한 쪽에서 FIN 패킷을 보내며 종료 시퀀스 진행함. (stop), 강제 종료 등 갑작스런 종료에는 RST 패킷을 보내며 종료.
 
-- Dial 시 적절한 timeout을 설정하여 빠르게 실패하도록 할 것
--
+- Dial 시 요청 프로세스 측은 적절한 timeout을 설정하여 빠르게 실패하도록 할 것
 
-#### UDP
+  - 오류 제어에서 살펴보았듯 데이터 분실에 대응하는 방법은 수신 호스트 측의 timeout 정책임.
+
+- TCP 프로토콜은 full duplex 통신을 지원하므로 가상 회선으로 연결된 두 프로세스가 동시에 데이터를 전송할 수 있다. 따라서 전송 데이터와 응답 데이터를 함께 전송하는 Piggybacking 기능을 사용한다.
+
+#### UDP(User datagram protocol)
 
 - connectionless라서 connection 생성 비용이 없음. 대신 신뢰성이 떨어짐
 - 비교적 데이터의 신뢰성이 중요하지 않을 때 사용함.
 
-#### Reliable UDP
+#### Reliable UDP(RUDP)
+
+- 보통 게임 서버에서 많이들 사용하고 Unity에 내장되어 해당 코드를 많이들 참고함
+
+[Reliability and Congestion Avoidance over UDP](https://gafferongames.com/post/reliability_ordering_and_congestion_avoidance_over_udp/)
+
+### 상위 계층(session, presentation, application)
+
+TCP/IP 모델에서는 보통 transport 계층 상위(session, presentation, application) 를 모두 Application 계층으로 퉁치곤 한다. 이는 일반적으로 세 계층의 기능이 하나의 프로그램으로 묶여 구현되기 때문이다.
+
+#### Session
+
+- 세션은 사용자 관점에서의 연결이다. transport 계층의 connection과 다른 점은, 연결된 사용자를 논리적으로 식별해낼 수 있다는 것이다. 예를 들어, TCP connection을 맺고 파일 전송 도중 연결이 끊겼다가 다시 돌아 왔을 때 세션으로 유저를 식별할 수 있다면 이전 파일 전송을 이어서 할 수 있다. 세션이 없다면 처음부터 받아야 한다.
+
+  - 이는 '동기'(synchronization)와 '재동기'(re-synchronization)이란 세션 계층의 기능을 풀어 설명한 것이다. 재동기란, 세션 연결을 통해 데이터를 주고 받아 오류가 발생했을 때 동기점으로 복구하는 기능이다.
+
+##### 세션 연결
+
+- 프로세스간 연결 과정에서 CONNECT 요구가 발생하면 세션 계층은 이를 transport 계층 프리미티브인 CONNECT 요구로 변환하여 수신 세션 사용자에게 전달하고 연결한다.
+- 클라이언트 프로세스와 서버 프로세스가 연결 되는 모델은 크게 두 가지가 존재한다.
+  - N:1 세션 연결(`다중 세션 연결`)
+    - 한 서버 프로세스에 여러 클라이언트 프로세스가 세션 연결되는 꼴이다.
+    - 서비스 시간이 짧은 경우 이 방식이 좋지만, 클라이언트가 많아지면 대기 시간이 길어진다는 단점
+  - 1:1 세션 연결(`단일 세션 연결`)
+    - 대표 서버에 클라이언트가 연결을 요청하면 대표 서버는 해당 클라이언트를 위한 별도의 서버 프로세스를 하나 열어서 해당 프로세스와 세션 연결을 맺어준다. 대표 서버는 하위 프로세스를 생성해주는 역할인 하는 셈이다.
+    - 클라이언트가 많아져도 대기 시간이 길어지지 않는다는 장점이 있지만, 알다시피 프로세스를 생성하는 비용은 크다. 그래서 서비스 시간이 짧은 경우에는 사용하지 않는 것이 좋다.
+    - 일반적으로 텔넷, FTP 등과 같이 대부분의 TCP/IP 서비스는 단일 세션 연결 방식을 사용
+
+#### Presentation
+
+#### Application
 
 ## 네트워크 지식 일반
 
@@ -374,9 +411,12 @@ dynamic routing은 네트워크 상황에 따라 경로 정보를 동적으로 �
     - 브로드캐스트 주소로 전송한다. 브로드캐스트 주소는 가능한 주소 중 가장 큰 수이다.
     - 예를 들어 10.128.0.0/16라면 10.128.255.255가 브로드캐스팅 주소일 것이다.
 
-### 홀펀칭(hole punching)
+### 홀펀칭(hole punching), STUN
 
 p2p 통신을 위해 NAT을 뚫는 방법.
+
+https://elky.tistory.com/259  
+https://cjwoov.tistory.com/6
 
 ### HTTP
 
@@ -444,3 +484,4 @@ https://darrengwon.tistory.com/1306?category=907881
 - [Backpressure explained — the resisted flow of data through software](https://medium.com/@jayphelps/backpressure-explained-the-flow-of-data-through-software-2350b3e77ce7)
 - [What is Acceptable Jitter?](https://medium.com/@datapath_io/what-is-acceptable-jitter-7e93c1e68f9b)
 - [Hello IPv6: a minimal tutorial for IPv4 users](https://metebalci.com/blog/hello-ipv6/)
+- [UCP vs TCP](https://gafferongames.com/post/udp_vs_tcp/)
