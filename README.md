@@ -247,17 +247,25 @@ multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:
 >
 > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
 
-> socket?
-> A socket is not a connection but a place to connect to. Just like a wall socket, where you can plug in connections. Many connections can be connected to the socket.
->
-> https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb
-
 ### 다중 접속 처리
 
 장단점 및 구현의 경제성을 고려하여 적절한 것을 선택해야겠다만 다중 접속을 처리하기 위한 여러가지 방법이 있다.
 
-- connection마다 process를 생성하는 multi process 방식
+- single thread
+
+  - 한 스레드에서 모든 것을 커넥션을 처리하기 때문에 수평 확장을 빠른 시기에 해야 함. 차라리 이게 단순해서 나은 결정일 수 있음.
+
 - connection마다 thread를 생성하는 multi thread 방식
+
+  - 아래 구분은 [Hussein Nasser의 Threads and Connections in Backend Applications](https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb)를 참고하였음.
+
+  - Multiple Threads Single Acceptor Architecture
+  - Multiple Threads Multiple Acceptors Architecture
+  - Multiple Threads with Message-based Load Balancing Architecture
+  - Multiple Threads with Socket Sharding (SO_REUSEPORT)
+
+- connection마다 process를 생성하는 multi process 방식
+
 - multiplexing
   - 단일 연결 안에서 여러 데이터가 섞이지 않게 전송하는 기법. 하나의 TCP connection에 여러 데이터를 병렬적으로 처리할 수 있게 된 것임.
 
