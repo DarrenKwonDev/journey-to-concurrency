@@ -1,3 +1,42 @@
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+- [computer structure](#computer-structure)
+  - [cpu](#cpu)
+    - [cpu register](#cpu-register)
+    - [CPU 명령어 사이클과 interrupt](#cpu-명령어-사이클과-interrupt)
+      - [왜 비동기 인터럽트라 부름?](#왜-비동기-인터럽트라-부름)
+      - [CPU가 interrupt를 처리한다는 것은 뭔가?](#cpu가-interrupt를-처리한다는-것은-뭔가)
+  - [CPU 성능 향상](#cpu-성능-향상)
+    - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
+    - [명령어 병렬 처리 기법(ILP, instruction level parallelism)](#명령어-병렬-처리-기법ilp-instruction-level-parallelism)
+    - [ISA와 CISC, RISC](#isa와-cisc-risc)
+    - [CPU 지표](#cpu-지표)
+  - [RAM](#ram)
+    - [메모리의 주소 공간](#메모리의-주소-공간)
+      - [물리 주소와 논리 주소](#물리-주소와-논리-주소)
+      - [MMU와 한계 레지스터](#mmu와-한계-레지스터)
+    - [캐시 메모리](#캐시-메모리)
+  - [보조 기억 장치](#보조-기억-장치)
+    - [flash memory](#flash-memory)
+    - [RAID](#raid)
+      - [RAID 0 (striping)](#raid-0-striping)
+      - [RAID 1 (mirroring)](#raid-1-mirroring)
+      - [RAID 4 (parity)](#raid-4-parity)
+      - [RAID 5 (parity 분산)](#raid-5-parity-분산)
+      - [RAID 6 (RAID 5보다 좀 더 안전하게)](#raid-6-raid-5보다-좀-더-안전하게)
+  - [입출력장치](#입출력장치)
+    - [장치 컨트롤러(I/O controller)](#장치-컨트롤러io-controller)
+    - [장치 컨트롤러 내부 장치](#장치-컨트롤러-내부-장치)
+    - [장치 드라이버](#장치-드라이버)
+    - [입출력 방법](#입출력-방법)
+      - [프로그램 입출력 programmed I/O](#프로그램-입출력programmed-io)
+      - [인터럽트 기반 입출력](#인터럽트-기반-입출력)
+    - [DMA](#dma)
+  - [etc](#etc)
+
+<!-- code_chunk_output -->
+<!-- /code_chunk_output -->
+
 # computer structure
 
 ## cpu

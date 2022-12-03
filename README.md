@@ -8,7 +8,7 @@
   - [컴퓨터의 발전과 동시성](#컴퓨터의-발전과-동시성)
   - [하드웨어적 스레드와 소프트웨어적 스레드](#하드웨어적-스레드와-소프트웨어적-스레드)
   - [동시성과 병렬성](#동시성과-병렬성)
-  - [multi-threading & multi-processing](#multi-threading--multi-processing)
+  - [multi-threading \& multi-processing](#multi-threading--multi-processing)
   - [threading model : 프로그래밍 언어에서 user thread를 os thread와 매핑하는 방법](#threading-model--프로그래밍-언어에서-user-thread를-os-thread와-매핑하는-방법)
   - [공유 자원 문제](#공유-자원-문제)
     - [(CPython 한정) GIL(Global Interpreter Lock)](#cpython-한정-gilglobal-interpreter-lock)
@@ -31,7 +31,6 @@
   - [브라우저 런타임에서의 동시성](#브라우저-런타임에서의-동시성)
     - [브라우저 런타임에서 web worker를 활용한 multi threading](#브라우저-런타임에서-web-worker를-활용한-multi-threading)
   - [docs](#docs)
-    [docs](#docs)
 
 <!-- code_chunk_output -->
 <!-- /code_chunk_output -->
@@ -233,6 +232,7 @@ multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:
 
   - 이것이 I/O bound 작업의 `유휴 시간`을 발생시키는 원인이다.
   - 그래서 입출력 집중 프로세스는 실행 상태보다는 입출력을 위한 대기 상태에 더 많이 머무르게 된다. 반대로 CPU 집중 프로세스는 대기 상태보다는 실행 상태에 더 많이 머무르게 된다. 그래서 보통 I/O bound process가 CPU bound process보다 우선순위가 높다.
+  - [I/O는 더 이상 병목이 아니라는 글](https://news.hada.io/topic?id=7906)도 있다.
 
   - CPU는 하나다. (core는 여러개지만.) 희소한 자원인 까닭에 운영체제는 프로세스마다 우선순위 priority를 부여하고 관리한다. 운영체제는 각 프로세스의 PCB에 우선순위를 명시하고, PCB에 적힌 우선순위를 기준으로 먼저 처리할 프로세스를 결정한다.
 
@@ -246,6 +246,11 @@ multi thread 방식으로 코딩을 하면 user thread가 os thread와 곧장 1:
 > 소켓은 네트워크에서 서버와 클라이언트, 두 개의 프로세스가 특정 포트를 통해 양방향 통신이 가능하도록 만들어 주는 추상화된 장치입니다. 메모리의 사용자 공간에 존재하는 프로세스(서버, 클라이언트)는 커널 공간에 생성된 소켓을 통해 데이터를 송수신할 수 있습니다.
 >
 > https://engineering.linecorp.com/ko/blog/do-not-block-the-event-loop-part1
+
+> socket?
+> A socket is not a connection but a place to connect to. Just like a wall socket, where you can plug in connections. Many connections can be connected to the socket.
+>
+> https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb
 
 ### 다중 접속 처리
 
@@ -409,6 +414,7 @@ https://codersblock.com/assets/demos/web-workers/single.html -> source tabdp서 
 
 ## docs
 
+https://medium.com/@hnasr/threads-and-connections-in-backend-applications-a225eed3eddb  
 https://docs.python.org/ko/3/library/threading.html  
 https://docs.python.org/ko/3/library/multiprocessing.html  
 https://docs.python.org/ko/3/library/concurrent.futures.html  

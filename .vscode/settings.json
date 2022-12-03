@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.html": "html",
+    "*.yml": "yaml",
+    "*.gohtml": "gohtml",
+    "socket.h": "c"
+  }
+}
