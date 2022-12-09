@@ -48,13 +48,6 @@
       - [프레임 할당](#프레임-할당)
   - [File system](#file-system)
     - [FD(file descriptor)](#fdfile-descriptor)
-    - [file \& directory](#file--directory)
-    - [partitioning \& formatting](#partitioning--formatting)
-    - [file allocation](#file-allocation)
-    - [FAT, Unix file system](#fat-unix-file-system)
-      - [FAT (linked allocation 기반)](#fat-linked-allocation-기반)
-      - [Unix file system (index allocation 기반)](#unix-file-system-index-allocation-기반)
-    - [Mount](#mount)
 
 <!-- code_chunk_output -->
 <!-- /code_chunk_output -->
@@ -503,12 +496,21 @@ CPU가 쉴새 없이 프로세스를 실행해야 컴퓨터 전체의 생산성�
 - 간단히 말하자면 `열려 있는 파일의 식별자`입니다.
 - 좀 더 세련되게 설명을 하자면, 유저는 직접 커널을 직접 제어하지 않고 syscall을 통해 간접적으로 fd를 경유하여 파일 시스템에 접근하므로 파일에 접근하기 위한 일종의 추상화된 인터페이스라 보아도 됩니다.
 - unix-like OS에서는 기본적으로 stdin, stdout, stderr에 각각 0, 1, 2의 fd를 부여하였습니다.
+
+  - python에서 정수를 하나 입력 받는 것을 stdin으로 직접 받을 수 있지만 다음과 같이 FD 0(stdin)을 명시하여 받는 형식으로 쓸 수도 있다.
+    ```python
+    int(sys.stdin.readline())
+    int(next(open(0)))
+    ```
+
 - fd 확인해보기
   ```bash
   sleep 1000 & # background 실행, pid가 반환됨
   jobs -l # 실행된 job의 pid 확인
   lsof -p $num # pid 기반으로 lsof 확인. FD와 TYPE 확인 가능
   ```
+
+````
 
 [File Descriptor](https://bottomupcs.com/ch01s03.html)
 
@@ -587,3 +589,4 @@ index allocaiton이면 색인 테이블에서 블록의 위치를 관리하여 �
 
 예를 들어 USB의 file system 내부 경로가 /darren/src/app 까지 존재하는데
 /mnt에 해당 usb를 mound 한다면 /mnt/usb/darren/src/app과 같이 접근 가능할 것이다.
+````
