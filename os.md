@@ -48,6 +48,13 @@
       - [프레임 할당](#프레임-할당)
   - [File system](#file-system)
     - [FD(file descriptor)](#fdfile-descriptor)
+    - [file \& directory](#file--directory)
+    - [partitioning \& formatting](#partitioning--formatting)
+    - [file allocation](#file-allocation)
+    - [FAT, Unix file system](#fat-unix-file-system)
+      - [FAT (linked allocation 기반)](#fat-linked-allocation-기반)
+      - [Unix file system (index allocation 기반)](#unix-file-system-index-allocation-기반)
+    - [Mount](#mount)
 
 <!-- code_chunk_output -->
 <!-- /code_chunk_output -->
@@ -510,8 +517,6 @@ CPU가 쉴새 없이 프로세스를 실행해야 컴퓨터 전체의 생산성�
   lsof -p $num # pid 기반으로 lsof 확인. FD와 TYPE 확인 가능
   ```
 
-````
-
 [File Descriptor](https://bottomupcs.com/ch01s03.html)
 
 ### file & directory
@@ -589,4 +594,7 @@ index allocaiton이면 색인 테이블에서 블록의 위치를 관리하여 �
 
 예를 들어 USB의 file system 내부 경로가 /darren/src/app 까지 존재하는데
 /mnt에 해당 usb를 mound 한다면 /mnt/usb/darren/src/app과 같이 접근 가능할 것이다.
-````
+
+```
+
+```
